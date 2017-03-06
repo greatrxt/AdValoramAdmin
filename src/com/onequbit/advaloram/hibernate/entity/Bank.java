@@ -16,7 +16,7 @@ public class Bank extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -8261363292250117393L;
+	public static final long serialVersionUID = -8261363292250117393L;
 	public String bankName, branchName, 
 					branchAddress, emailAddress, 
 					relationshipManagerName, 

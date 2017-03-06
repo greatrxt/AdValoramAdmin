@@ -16,7 +16,7 @@ public class Size extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4621899079285800805L;
+	public static final long serialVersionUID = -4621899079285800805L;
 	//public long id;
 	public String sizeCode;
 	

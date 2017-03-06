@@ -19,7 +19,7 @@ public class Location extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3970218530834203114L;
+	public static final long serialVersionUID = -3970218530834203114L;
 	/**
 	 * 
 	 */

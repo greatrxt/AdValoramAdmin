@@ -16,10 +16,10 @@ public class Style extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -8626826511075223858L;
+	public static final long serialVersionUID = -8626826511075223858L;
 	//private long id;
-	private String styleCode;
-	private String styleDetails;
+	public String styleCode;
+	public String styleDetails;
 	
 /*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")

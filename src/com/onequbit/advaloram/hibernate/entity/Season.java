@@ -16,7 +16,7 @@ public class Season extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -7095574745711279460L;
+	public static final long serialVersionUID = -7095574745711279460L;
 	//private long id;
 	public String code;
 	public String season;

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import com.onequbit.advaloram.hibernate.dao.SizeDao;
+import com.onequbit.advaloram.hibernate.entity.Brand;
 import com.onequbit.advaloram.hibernate.entity.Color;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Product;
@@ -21,8 +22,15 @@ public class RunIt {
 		session.beginTransaction();
 
 		Product stock = new Product();
-        stock.setProductName("abcd");
-        stock.setEanCode("fhbruehg");        
+        stock.setProductName("MyJeans");
+        stock.setEanCode("5894375876578");        
+        
+        stock.setBrand(session.load(Brand.class, Long.parseLong("1")));
+        
+        Set<Size> sizes = new HashSet<Size>();
+        sizes.add(session.load(Size.class, Long.parseLong("2")));
+        sizes.add(session.load(Size.class, Long.parseLong("5")));
+        
         
         Set<Color> colors = new HashSet<Color>();
         colors.add(session.load(Color.class, Long.parseLong("1")));

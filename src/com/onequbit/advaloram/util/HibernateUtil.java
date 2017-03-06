@@ -2,6 +2,7 @@ package com.onequbit.advaloram.util;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -9,10 +10,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.onequbit.advaloram.hibernate.entity.AbstractAdValoramEntity;
 import com.onequbit.advaloram.hibernate.entity.Bank;
 import com.onequbit.advaloram.hibernate.entity.Brand;
 import com.onequbit.advaloram.hibernate.entity.Color;
@@ -23,7 +24,6 @@ import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.ProductCategory;
 import com.onequbit.advaloram.hibernate.entity.Season;
 import com.onequbit.advaloram.hibernate.entity.Size;
-import com.onequbit.advaloram.hibernate.entity.Style;
 import com.onequbit.advaloram.hibernate.entity.Transporter;
 import com.onequbit.advaloram.hibernate.entity.UnitOfMeasurement;
 
@@ -93,33 +93,67 @@ public class HibernateUtil {
 	public static JSONObject getJsonFromHibernateEntity(Object entity){
 		JSONObject entityJson = new JSONObject();
 		Field[] fields = entity.getClass().getDeclaredFields();
-		for(int f = 0; f < fields.length; f++){
-			Field field = fields[f];
-			try {
-				if(!field.getName().equals("serialVersionUID")){
-					entityJson.put(field.getName(), field.get(entity));
-				}
-			} catch (JSONException | IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
+		loadEntityDataIntoJson(entity, fields, entityJson);
 		
 		Field[] superClassFields = entity.getClass().getSuperclass().getDeclaredFields();
-		for(int f = 0; f < superClassFields.length; f++){
-			Field field = superClassFields[f];
-			try {
-				if(!field.getName().equals("serialVersionUID")){
-					entityJson.put(field.getName(), field.get(entity));
-				}
-			} catch (JSONException | IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
+		loadEntityDataIntoJson(entity, superClassFields, entityJson);
 		
 		return entityJson;
 	}
 	
+	/**
+	 * 
+	 * @param entity
+	 * @param fields
+	 * @param entityJson
+	 */
+	private static void loadEntityDataIntoJson(Object entity, Field[] fields, JSONObject entityJson){
+		for(int f = 0; f < fields.length; f++){
+			Field field = fields[f];
+			try {
+				if(field.getName().equals("serialVersionUID")){
+					continue;
+				}
+				
+				if(field.get(entity) == null){
+					entityJson.put(field.getName(), "No Data");
+					continue;
+				}
+				
+				if(field.getType().isAssignableFrom(String.class) || 
+						field.getType().isAssignableFrom(Long.class) ||
+						field.getType().isAssignableFrom(Integer.class)) {
+					
+						entityJson.put(field.getName(), field.get(entity));
+					
+				} else if(field.getType().isAssignableFrom(Set.class)){
+					//Hibernate entity
+					JSONArray collectionArray = new JSONArray();
+					
+					Set<Object> subEntityCollection = (Set) field.get(entity);
+					for(Object subEntity: subEntityCollection){
+						JSONObject subEntityJson = new JSONObject();
+						loadEntityDataIntoJson(subEntity, subEntity.getClass().getDeclaredFields(), subEntityJson);
+						collectionArray.put(subEntityJson);
+					}
+					entityJson.put(field.getName(), collectionArray);
+				} else {
+					
+					JSONObject subEntityJson = new JSONObject();
+					loadEntityDataIntoJson(field.get(entity), field.get(entity).getClass().getDeclaredFields(), subEntityJson);
+					entityJson.put(field.getName(), subEntityJson);
+					
+				}
+			} catch (JSONException | IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}		
+	}
 	
+	/**
+	 * 
+	 * @return
+	 */
     private static SessionFactory buildSessionAnnotationFactory() {
     	try {
     		

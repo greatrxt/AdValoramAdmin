@@ -11,7 +11,7 @@ public class Brand extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1744185554531654447L;
+	public static final long serialVersionUID = -1744185554531654447L;
 
 	
 	public String brandName;

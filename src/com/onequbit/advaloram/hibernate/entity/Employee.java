@@ -23,7 +23,7 @@ public class Employee extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -5059377149015218370L;
+	public static final long serialVersionUID = -5059377149015218370L;
 
 	//public long id;
 	

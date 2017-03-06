@@ -16,9 +16,9 @@ public class ProductCategory extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -5815975080938929954L;
+	public static final long serialVersionUID = -5815975080938929954L;
 	//private long id;
-	private String categoryName;
+	public String categoryName;
 	
 /*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")

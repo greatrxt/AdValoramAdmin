@@ -22,7 +22,7 @@ public class Customer extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4610067445012757575L;
+	public static final long serialVersionUID = 4610067445012757575L;
 
 	//public long id;
 	

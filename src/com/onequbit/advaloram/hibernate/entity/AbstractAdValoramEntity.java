@@ -15,7 +15,7 @@ import javax.persistence.Version;
 @MappedSuperclass
 public abstract class AbstractAdValoramEntity implements Serializable{	
 
-	private static final long serialVersionUID = -562453167454180506L;
+	public static final long serialVersionUID = -562453167454180506L;
 
 
 	public Long id = null;

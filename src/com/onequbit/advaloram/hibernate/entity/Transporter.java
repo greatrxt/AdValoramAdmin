@@ -22,7 +22,7 @@ public class Transporter extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -6908383759672766436L;
+	public static final long serialVersionUID = -6908383759672766436L;
 	//public long id;
 	
 	public String companyName;

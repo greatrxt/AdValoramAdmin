@@ -11,7 +11,7 @@ public class Color extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3631580932167147349L;
+	public static final long serialVersionUID = -3631580932167147349L;
 	//private long id;
 	//public String code;
 	public String color;

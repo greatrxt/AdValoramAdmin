@@ -13,6 +13,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 
 //https://www.mkyong.com/hibernate/hibernate-many-to-many-relationship-example-annotation/
 @Entity
@@ -22,7 +25,7 @@ public class Product extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 6641898589463808223L;
+	public static final long serialVersionUID = 6641898589463808223L;
 	//private long id;
 	
 	//private Style styleCode;
@@ -52,14 +55,16 @@ public class Product extends AbstractAdValoramEntity {
 		return styleCode;
 	}*/
 	
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="color_code", nullable = true, referencedColumnName = "color_code")
-	@OrderBy("uuidColumn")
+	//@OrderBy("uuidColumn")
 	public Set<Color> getColorCodes() {
 		return colorCodes;
 	}
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@Fetch (FetchMode.SELECT)
 	@JoinTable(name = "product_gender", catalog = "public", joinColumns = {
 			@JoinColumn(name = "product_id", nullable = true, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "gender_code",
@@ -69,7 +74,8 @@ public class Product extends AbstractAdValoramEntity {
 	}
 	
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@Fetch (FetchMode.SELECT)
 	@JoinTable(name = "product_size", catalog = "public", joinColumns = {
 			@JoinColumn(name = "product_id", nullable = true, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "size_code",
@@ -78,25 +84,29 @@ public class Product extends AbstractAdValoramEntity {
 		return sizeCodes;
 	}
 	
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="season_code", nullable = true, referencedColumnName = "season_code")
 	public Season getSeasonCode() {
 		return seasonCode;
 	}
 	
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="brand_name", nullable = true, referencedColumnName = "brand_name")
 	public Brand getBrand() {
 		return brand;
 	}
 	
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="category_name", nullable = true, referencedColumnName = "category_name")
 	public ProductCategory getProductCategory() {
 		return productCategory;
 	}
 	
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="uom_code", nullable = true, referencedColumnName = "uom_code")
 	public UnitOfMeasurement getUnitOfMeasurement() {
 		return unitOfMeasurement;

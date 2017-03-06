@@ -16,10 +16,10 @@ public class UnitOfMeasurement extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8955632550187767669L;
+	public static final long serialVersionUID = 8955632550187767669L;
 	//private long id;
-	private String description;
-	private String uomCode;
+	public String description;
+	public String uomCode;
 	
 /*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")
