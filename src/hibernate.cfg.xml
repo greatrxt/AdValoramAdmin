@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+ 
+<hibernate-configuration>
+    <session-factory>
+ 
+        <!-- Connection settings -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/AdValoram</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">admin</property>
+ 		<property name="hibernate.hbm2ddl.auto">update</property>
+        <!-- SQL dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+         <property name="hibernate.hbm2ddl.auto">update</property>
+ 
+        <!-- Print executed SQL to stdout -->
+         <property name="hibernate.show_sql">true</property>          
+ 		<property name="format_sql">true</property>
+		<property name="use_sql_comments">true</property>     
+ 
+	    <property name="hibernate.c3p0.min_size">5</property>
+	    <property name="hibernate.c3p0.max_size">20</property>
+	    <property name="hibernate.c3p0.timeout">300</property>
+	    <property name="hibernate.c3p0.max_statements">50</property>
+	    <property name="hibernate.c3p0.idle_test_period">3000</property>
+ 
+        <!-- Annotated entity classes  
+        <mapping class="com.onequbit.advaloram.hibernate.entity.Brand"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.Color"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.Gender"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.Product"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.ProductCategory"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.Season"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.Size"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.Style"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.UnitOfMeasurement"/>
+		<mapping class="com.onequbit.advaloram.hibernate.entity.Location"/> -->   
+    </session-factory>
+</hibernate-configuration>
