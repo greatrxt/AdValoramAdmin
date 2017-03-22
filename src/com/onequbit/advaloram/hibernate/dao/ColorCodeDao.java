@@ -10,23 +10,23 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
-import com.onequbit.advaloram.hibernate.entity.Color;
+import com.onequbit.advaloram.hibernate.entity.ColorCode;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
 
-public class ColorDao {
+public class ColorCodeDao {
 
-	public static Color getColorUsingColorName(String color){
+	public static ColorCode getColorCodeUsingColorCodeName(String colorCode){
 		Session session = null;
 		try {
 			
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
 			
-			Criteria criteria = session.createCriteria(Color.class);
-			criteria.add(Restrictions.eq("colorName", color));
+			Criteria criteria = session.createCriteria(ColorCode.class);
+			criteria.add(Restrictions.eq("colorCode", colorCode));
 			
-			List<Color> list = criteria.list();
+			List<ColorCode> list = criteria.list();
 			if(list.size() > 0){
 				return list.get(0);
 			}
@@ -42,18 +42,18 @@ public class ColorDao {
 	}
 	
 	/**
-	 * Return all available colors
+	 * Return all available colorCodes
 	 * @return
 	 */
-	public static List<Color> getAllColors(){
+	public static List<ColorCode> getAllColorCodes(){
 		Session session = null;
 		try {
 			
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
 			
-			Criteria criteria = session.createCriteria(Color.class);			
-			List<Color> list = criteria.list();
+			Criteria criteria = session.createCriteria(ColorCode.class);			
+			List<ColorCode> list = criteria.list();
 			if(list.size() > 0){
 				return list;
 			}
@@ -69,27 +69,27 @@ public class ColorDao {
 	}
 	
 	/**
-	 * Get all Colors
+	 * Get all ColorCodes
 	 * @return
 	 */
-	public static JSONObject getAllColorsJson(){
+	public static JSONObject getAllColorCodesJson(){
 		JSONObject resultsJson = new JSONObject();
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
 		try {
 						
-			List<Color> colorsList = (List<Color>)(Object)HibernateUtil.getAll(Color.class);
+			List<ColorCode> colorCodesList = (List<ColorCode>)(Object)HibernateUtil.getAll(ColorCode.class);
 
-			if(colorsList.size() == 0){
-				//No Color found
+			if(colorCodesList.size() == 0){
+				//No ColorCode found
 				resultsJson.put(Application.RESULT, Application.ERROR);
-				resultsJson.put(Application.ERROR_MESSAGE, "No Color found");
+				resultsJson.put(Application.ERROR_MESSAGE, "No ColorCode found");
 			} else {
-				Iterator<Color> iterator = colorsList.iterator();
+				Iterator<ColorCode> iterator = colorCodesList.iterator();
 				while(iterator.hasNext()){
-					Color color = iterator.next();
-					JSONObject colorJson = HibernateUtil.getJsonFromHibernateEntity(color);
-					resultArray.put(colorJson);
+					ColorCode colorCode = iterator.next();
+					JSONObject colorCodeJson = HibernateUtil.getJsonFromHibernateEntity(colorCode);
+					resultArray.put(colorCodeJson);
 				}
 				resultsJson.put(Application.RESULT, resultArray);
 			}

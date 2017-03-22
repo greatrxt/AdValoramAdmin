@@ -94,25 +94,34 @@ public class BankDao {
 	 * @param bankJson
 	 * @return
 	 */
-	public static JSONObject createBank(JSONObject bankJson){
+	public static JSONObject createOrUpdateBank(Long id, JSONObject bankJson){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
-		
-		try {			
-			Bank bank = new Bank();
-			HibernateUtil.setDataFromJson(bank, bankJson);
+		Bank bank = null;
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
 			
-			if(getBank(bank) != null){
+			if(id > 0){
+				bank = session.get(Bank.class, id); 
+			} else {
+				bank = new Bank();
+			}			
+			
+			HibernateUtil.setDataFromJson(bank, bankJson);			
+			
+			if(getBank(bank) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "bank " + bankJson.toString() + " already exists");
 			} else {
-			
-				session = HibernateUtil.getSessionAnnotationFactory().openSession();
-				session.beginTransaction();
-				bank.setCity(session.load(Location.class, Long.parseLong(bankJson.getString("city"))));
-				bank.setRecordCreationTime(SystemUtils.getFormattedDate());					
-				session.save(bank);					
+				bank.setCity(session.load(Location.class, Long.parseLong(bankJson.getString("city"))));				
+				if(id > 0){
+					session.update(bank);
+				} else {
+					bank.setRecordCreationTime(SystemUtils.getFormattedDate());	
+					session.save(bank);					
+				}
 				session.getTransaction().commit();						
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		

@@ -111,6 +111,9 @@ public class EmployeeDao {
 				session = HibernateUtil.getSessionAnnotationFactory().openSession();
 				session.beginTransaction();
 				employee.setCity(session.load(Location.class, Long.parseLong(employeeJson.getString("city"))));
+				if(!employeeJson.getString("reportingTo").trim().isEmpty()){
+					employee.setReportingTo(session.load(Employee.class, Long.parseLong(employeeJson.getString("reportingTo"))));
+				}
 				employee.setRecordCreationTime(SystemUtils.getFormattedDate());					
 				session.save(employee);					
 				session.getTransaction().commit();						

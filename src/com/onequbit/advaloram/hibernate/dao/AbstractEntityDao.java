@@ -22,6 +22,7 @@ import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.ProductCategory;
 import com.onequbit.advaloram.hibernate.entity.Season;
 import com.onequbit.advaloram.hibernate.entity.Size;
+import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
 import com.onequbit.advaloram.hibernate.entity.Style;
 import com.onequbit.advaloram.hibernate.entity.Transporter;
 import com.onequbit.advaloram.hibernate.entity.UnitOfMeasurement;
@@ -43,7 +44,93 @@ public class AbstractEntityDao {
 			SIZE = "size",
 			STYLE = "style",
 			TRANSPORTER = "transporter",
-			UNIT_OF_MEASUREMENT = "unitOfMeasurement";
+			UNIT_OF_MEASUREMENT = "unitOfMeasurement",
+			STOCK_KEEPING_UNIT = "stockKeepingUnit";
+	
+	/**
+	 * 
+	 * @param entityClass
+	 * @param id
+	 * @return
+	 */
+	public static JSONObject getEntityUsingId(String entityClass, long id){
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {
+			Object entity = null;			
+			switch(entityClass){
+				case BANK:				
+					entity = HibernateUtil.getUsingId(Bank.class, id);
+					break;
+				case BRAND:
+					entity = HibernateUtil.getUsingId(Brand.class, id);
+					break;
+				case COLOR:
+					entity = HibernateUtil.getUsingId(Color.class, id);
+					break;
+				case CUSTOMER:
+					entity = HibernateUtil.getUsingId(Customer.class, id);
+					break;
+				case EMPLOYEE:
+					entity = HibernateUtil.getUsingId(Employee.class, id);
+					break;
+				case GENDER:
+					entity = HibernateUtil.getUsingId(Gender.class, id);
+					break;
+				case LOCATION:
+					entity = HibernateUtil.getUsingId(Location.class, id);
+					break;
+				case PRODUCT:
+					entity = HibernateUtil.getUsingId(Product.class, id);
+					break;
+				case PRODUCT_CATEGORY:
+					entity = HibernateUtil.getUsingId(ProductCategory.class, id);
+					break;
+				case SEASON:
+					entity = HibernateUtil.getUsingId(Season.class, id);
+					break;
+				case SIZE:
+					entity = HibernateUtil.getUsingId(Size.class, id);
+					break;
+				case STYLE:
+					entity = HibernateUtil.getUsingId(Style.class, id);
+					break;
+				case TRANSPORTER:
+					entity = HibernateUtil.getUsingId(Transporter.class, id);
+					break;
+				case UNIT_OF_MEASUREMENT:
+					entity = HibernateUtil.getUsingId(UnitOfMeasurement.class, id);
+					break;
+				case STOCK_KEEPING_UNIT:
+					entity = HibernateUtil.getUsingId(StockKeepingUnit.class, id);
+					break;
+				default:
+					throw new Exception("Class" + entityClass + "not found");
+			}
+			
+
+			if(entity == null){
+				//No Object found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No "+ entityClass + " found");
+			} else {
+				JSONObject entityJson = HibernateUtil.getJsonFromHibernateEntity(entity);
+				resultArray.put(entityJson);				
+				resultsJson.put(Application.RESULT, resultArray);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
 	
 
 	/**
@@ -51,7 +138,7 @@ public class AbstractEntityDao {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static JSONObject getAll(String entityClass){
+	public static JSONObject getJsonForAll(String entityClass){
 		JSONObject resultsJson = new JSONObject();
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
@@ -100,6 +187,9 @@ public class AbstractEntityDao {
 				case UNIT_OF_MEASUREMENT:
 					entityList = (List<Object>)(Object)HibernateUtil.getAll(UnitOfMeasurement.class);
 					break;
+				case STOCK_KEEPING_UNIT:
+					entityList = (List<Object>)(Object)HibernateUtil.getAll(StockKeepingUnit.class);
+					break;
 				default:
 					throw new Exception("Class" + entityClass + "not found");
 			}
@@ -108,7 +198,7 @@ public class AbstractEntityDao {
 			if(entityList.size() == 0){
 				//No Object found
 				resultsJson.put(Application.RESULT, Application.ERROR);
-				resultsJson.put(Application.ERROR_MESSAGE, "No Object found");
+				resultsJson.put(Application.ERROR_MESSAGE, "No "+ entityClass + " found");
 			} else {
 				Iterator<Object> iterator = entityList.iterator();
 				while(iterator.hasNext()){
@@ -137,7 +227,7 @@ public class AbstractEntityDao {
 	 * @param entity
 	 * @return
 	 */
-	public static Color getEntity(String entityClass, Object entity){
+	private static Object getEntity(String entityClass, Object entity){
 		Session session = null;
 		try {
 			
@@ -156,7 +246,7 @@ public class AbstractEntityDao {
 				break;
 			case COLOR:
 				criteria = session.createCriteria(Color.class);
-				criteria.add(Restrictions.eq("colorCode", ((Color) entity).getColorCode()).ignoreCase());
+				criteria.add(Restrictions.eq("colorName", ((Color) entity).getColorName()).ignoreCase());
 				break;
 			case CUSTOMER:
 				criteria = session.createCriteria(Customer.class);
@@ -223,6 +313,7 @@ public class AbstractEntityDao {
 	public static JSONObject createEntity(String entityClass, JSONObject entityJson){
 		
 		Session session = null;		
+		session = HibernateUtil.getSessionAnnotationFactory().openSession();
 		JSONObject result = new JSONObject();
 		AbstractAdValoramEntity entity = null;
 		try {			
@@ -275,16 +366,12 @@ public class AbstractEntityDao {
 			}
 			
 			HibernateUtil.setDataFromJson(entity, entityJson);
-			entity.setVersion(HibernateUtil.DB_VERSION);
 			entity.setRecordCreationTime(SystemUtils.getFormattedDate());
-			entity.setLastUpdate(SystemUtils.getFormattedDate());
 			
 			if(getEntity(entityClass, entity) != null){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "entity " + entityJson.toString() + " already exists");
-			} else {
-			
-				session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			} else {			
 				session.beginTransaction();					
 				session.save(entity);					
 				session.getTransaction().commit();						

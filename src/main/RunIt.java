@@ -1,5 +1,6 @@
 package main;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.Size;
 import com.onequbit.advaloram.util.HibernateUtil;
+import com.onequbit.advaloram.util.SystemUtils;
 
 public class RunIt {
 
@@ -31,11 +33,15 @@ public class RunIt {
         sizes.add(session.load(Size.class, Long.parseLong("2")));
         sizes.add(session.load(Size.class, Long.parseLong("5")));
         
+        HashMap<String, Color> colors = new HashMap<>();
+        colors.put("C1", session.load(Color.class, Long.parseLong("1")));
+        colors.put("C2", session.load(Color.class, Long.parseLong("3")));
         
-        Set<Color> colors = new HashSet<Color>();
-        colors.add(session.load(Color.class, Long.parseLong("1")));
-        colors.add(session.load(Color.class, Long.parseLong("2")));
-        stock.setColorCodes(colors);
+        //stock.setColor(colors);
+        stock.setRecordCreationTime(SystemUtils.getFormattedDate());
+        stock.setLastUpdate(SystemUtils.getFormattedDate());
+        stock.setVersion(0);
+        
         session.save(stock);
 
 		session.getTransaction().commit();

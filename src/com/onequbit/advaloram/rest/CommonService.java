@@ -29,12 +29,32 @@ public class CommonService {
 	@GET
 	@Path("/{entityClass}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getAllCommons(@Context HttpServletRequest request, 
+	public static Response getAll(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext, @PathParam("entityClass") String entityClass){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = AbstractEntityDao.getAll(entityClass);
+			result = AbstractEntityDao.getJsonForAll(entityClass);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@GET
+	@Path("/{entityClass}/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getUsingId(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("entityClass") String entityClass,  @PathParam("id") Long id){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = AbstractEntityDao.getEntityUsingId(entityClass, id);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

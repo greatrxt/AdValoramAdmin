@@ -94,25 +94,36 @@ public class TransporterDao {
 	 * @param transporterJson
 	 * @return
 	 */
-	public static JSONObject createTransporter(JSONObject transporterJson){
+	public static JSONObject createOrUpdateTransporter(Long id, JSONObject transporterJson){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
+		Transporter transporter = null;
 		
-		try {			
-			Transporter transporter = new Transporter();
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			
+			if(id < 0){
+				transporter = new Transporter();
+			} else {
+				transporter = session.get(Transporter.class, id);
+			}
+			
 			HibernateUtil.setDataFromJson(transporter, transporterJson);
 			
-			if(getTransporter(transporter) != null){
+			if(getTransporter(transporter) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "transporter " + transporterJson.toString() + " already exists");
 			} else {
-			
-				session = HibernateUtil.getSessionAnnotationFactory().openSession();
 				session.beginTransaction();
 				transporter.setCity(session.load(Location.class, Long.parseLong(transporterJson.getString("city"))));
-				transporter.setRecordCreationTime(SystemUtils.getFormattedDate());					
-				session.save(transporter);					
+								
+				if(id < 0){
+					transporter.setRecordCreationTime(SystemUtils.getFormattedDate());	
+					session.save(transporter);
+				} else {
+					session.update(transporter);
+				}
 				session.getTransaction().commit();						
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		

@@ -3,14 +3,21 @@ package com.onequbit.advaloram.hibernate.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @MappedSuperclass
 public abstract class AbstractAdValoramEntity implements Serializable{	
@@ -24,8 +31,21 @@ public abstract class AbstractAdValoramEntity implements Serializable{
 
     public Date recordCreationTime;
 	
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    public AdValUser createdByUser;
+    
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+	@Fetch (FetchMode.SELECT)
+    @JoinColumn(name="created_by_user", nullable = true, referencedColumnName = "username")
+    public AdValUser getCreatedBy() {
+		return createdByUser;
+	}
+
+	public void setCreatedBy(AdValUser createdByUser) {
+		this.createdByUser = createdByUser;
+	}
+
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
 	public Long getId() {
 		return id;

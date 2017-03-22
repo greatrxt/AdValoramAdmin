@@ -102,24 +102,33 @@ public class LocationDao {
 	 * @param locationJson
 	 * @return
 	 */
-	public static JSONObject createLocation(JSONObject locationJson){
+	public static JSONObject createOrUpdateLocation(Long id, JSONObject locationJson){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
+		Location location = null;
 		
-		try {			
-			Location location = new Location();
+		try {		
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction(); 
+			if(id > 0){
+				location = session.get(Location.class, id);
+			} else {
+				location = new Location();
+			}
+			
 			HibernateUtil.setDataFromJson(location, locationJson);
 			
-			if(getLocation(location) != null){
+			if(getLocation(location) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "Location " + locationJson.toString() + " already exists");
 			} else {
-			
-				session = HibernateUtil.getSessionAnnotationFactory().openSession();
-				session.beginTransaction(); 
-				location.setRecordCreationTime(SystemUtils.getFormattedDate());					
-				session.save(location);					
+				if(id > 0){
+					session.update(location);
+				} else {
+					location.setRecordCreationTime(SystemUtils.getFormattedDate());					
+					session.save(location);
+				}
 				session.getTransaction().commit();						
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		

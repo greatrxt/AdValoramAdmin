@@ -36,7 +36,7 @@ public class Transporter extends AbstractAdValoramEntity {
 	
 	public String emailAddress;
 	
-	public Integer numberForVehicles;
+	public Integer numberOfVehicles;
 	
 	public String bankingName, bankName, bankAccountNumber, bankIfscCode, serviceTaxNumber, panNumber, modeOfPayment;
 	
@@ -92,7 +92,7 @@ public class Transporter extends AbstractAdValoramEntity {
 		this.localHubAddress = localHubAddress;
 	}
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="city_name", nullable = false, referencedColumnName = "city_name")
 	public Location getCity() {
 		return city;
@@ -157,12 +157,12 @@ public class Transporter extends AbstractAdValoramEntity {
 	}
 
 	@Column(name="number_of_vehicles")
-	public Integer getNumberForVehicles() {
-		return numberForVehicles;
+	public Integer getNumberOfVehicles() {
+		return numberOfVehicles;
 	}
 
-	public void setNumberForVehicles(Integer numberForVehicles) {
-		this.numberForVehicles = numberForVehicles;
+	public void setNumberOfVehicles(Integer numberOfVehicles) {
+		this.numberOfVehicles = numberOfVehicles;
 	}
 
 	@Column(name="banking_name")

@@ -8,6 +8,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -25,6 +27,8 @@ public class CustomerService {
 	final static Logger logger = Logger.getLogger(CustomerService.class);
 	
 	@GET
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllCustomers(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
@@ -42,8 +46,30 @@ public class CustomerService {
 		return Response.status(Response.Status.OK).entity(result.toString()).build();
 	}
 	
+	@GET
+	@Path("/{type}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getAllCustomersOfType(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext,  @PathParam("type") String type){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = CustomerDao.getAllCustomersOfType(type);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response createCustomer(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		

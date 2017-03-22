@@ -88,19 +88,69 @@ public class CustomerDao {
 		return resultsJson;
 	}
 	
+	/**
+	 * Get all Customers of type
+	 * @return
+	 */
+	public static JSONObject getAllCustomersOfType(String type){
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {
+						
+			List<Customer> customersList;
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(Customer.class);		
+			criteria.add(Restrictions.eq("customerType", type).ignoreCase());
+			customersList = criteria.list();
+
+
+			if(customersList.size() == 0){
+				//No Customer found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No Customer found");
+			} else {
+				Iterator<Customer> iterator = customersList.iterator();
+				while(iterator.hasNext()){
+					Customer customer = iterator.next();
+					JSONObject customerJson = HibernateUtil.getJsonFromHibernateEntity(customer);
+					resultArray.put(customerJson);
+				}
+				resultsJson.put(Application.RESULT, resultArray);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
 	
 	/**
 	 * 
 	 * @param customerJson
 	 * @return
 	 */
-	public static JSONObject createCustomer(JSONObject customerJson){
+	public static JSONObject createCustomer(Long id, JSONObject customerJson){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
-		
-		try {			
-			Customer customer = new Customer();
+		Customer customer = null;
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			if(id < 0){
+				customer = new Customer();
+			} else {
+				customer = session.get(Customer.class, id);
+			}
+			
 			HibernateUtil.setDataFromJson(customer, customerJson);
 			
 			if(getCustomer(customer) != null){
@@ -108,11 +158,16 @@ public class CustomerDao {
 				result.put(Application.ERROR_MESSAGE, "customer " + customerJson.toString() + " already exists");
 			} else {
 			
-				session = HibernateUtil.getSessionAnnotationFactory().openSession();
+				
 				session.beginTransaction();
 				customer.setCity(session.load(Location.class, Long.parseLong(customerJson.getString("city"))));
-				customer.setRecordCreationTime(SystemUtils.getFormattedDate());					
-				session.save(customer);					
+							
+				if(id < 0){
+					customer.setRecordCreationTime(SystemUtils.getFormattedDate());		
+					session.save(customer);					
+				} else {
+					session.update(customer);
+				}
 				session.getTransaction().commit();						
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		

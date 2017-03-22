@@ -1,19 +1,12 @@
 package com.onequbit.advaloram.hibernate.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "customer")
@@ -28,26 +21,45 @@ public class Customer extends AbstractAdValoramEntity {
 	
 	public String companyName;
 	public String customerType;
-	public Customer linkedDistributor, linkedBroker;
-	public String billingAddress, deliveryAddress;
+	public Customer linkedDistributor;
+	public Customer linkedBroker;
+	public String billingAddress;
+	public String deliveryAddress;
 	
 	public Location city; //not saving district and state. Can be figured out from location
 	public String pinCode;
 	
-	public String contactPerson, contactNumber;
+	public String contactPerson;
+	public String contactNumber;
 	
 	public String emailAddress;
 
-	public float markDown, cashDiscount, promptPaymentDiscount, specialDiscount, distributorCommission, brokerCommission;
+	public float markDown;
+	public float cashDiscount;
+	public float promptPaymentDiscount;
+	public float specialDiscount;
+	public float distributorCommission;
+	public float brokerCommission;
 	public int creditPeriod, creditLimit;
 	
 	public String paymentTerms;
 	
-	public String financialGrouping, vatTinNumber, cstTinNumber, serviceTaxNumber, panNumber;
+	public String financialGrouping;
+	public String vatTinNumber;
+	public String cstTinNumber;
+	public String serviceTaxNumber;
+	public String panNumber;
 	
-	public boolean vatIsApplicable, cstIsApplicable, gstIsApplicable, octroiLbtEntryTaxIsApplicable;
+	public boolean vatIsApplicable;
+	public boolean cstIsApplicable;
+	public boolean gstIsApplicable;
+	public boolean octroiLbtEntryTaxIsApplicable;
 	
-	public float cstRateApplicable, vatRateApplicable, cstRateAgainstFormC, gstRateApplicable, octroiLbtEntryTaxApplicable;
+	public float cstRateApplicable;
+	public float vatRateApplicable;
+	public float cstRateAgainstFormC;
+	public float gstRateApplicable;
+	public float octroiLbtEntryTaxApplicable;
 	
 	public Transporter linkedTransporter;
 	
@@ -55,18 +67,6 @@ public class Customer extends AbstractAdValoramEntity {
 	
 	public String specialInstructions, notes, filesMetaData;
 	
-	//public Date recordCreationTime;
-	
-/*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
-	public long getId() {
-		return id;
-	}
-	
-	public void setId(long id) {
-		this.id = id;
-	}*/
-
 	@Column(name="company_name")
 	public String getCompanyName() {
 		return companyName;
@@ -76,7 +76,7 @@ public class Customer extends AbstractAdValoramEntity {
 		this.companyName = companyName;
 	}
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@OneToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="linked_distributor", nullable = true, referencedColumnName = "id")
 	public Customer getLinkedDistributor() {
 		return linkedDistributor;
@@ -86,6 +86,7 @@ public class Customer extends AbstractAdValoramEntity {
 		this.linkedDistributor = linkedDistributor;
 	}
 
+	@OneToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="linked_broker", nullable = true, referencedColumnName = "id")
 	public Customer getLinkedBroker() {
 		return linkedBroker;
@@ -122,7 +123,7 @@ public class Customer extends AbstractAdValoramEntity {
 		this.deliveryAddress = deliveryAddress;
 	}
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="city_name", nullable = false, referencedColumnName = "city_name")
 	public Location getCity() {
 		return city;
@@ -403,7 +404,7 @@ public class Customer extends AbstractAdValoramEntity {
 		this.octroiLbtEntryTaxApplicable = octroiLbtEntryTaxApplicable;
 	}
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="linked_transporter", nullable = true, referencedColumnName = "company_name")
 	public Transporter getLinkedTransporter() {
 		return linkedTransporter;

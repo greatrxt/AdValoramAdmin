@@ -52,7 +52,7 @@ public class Bank extends AbstractAdValoramEntity {
 		this.alternateContactNumber = alternateContactNumber;
 	}
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="city_name", nullable = false, referencedColumnName = "city_name")
 	public Location getCity() {
 		return city;

@@ -1,12 +1,7 @@
 package com.onequbit.advaloram.hibernate.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
@@ -21,11 +16,6 @@ public class Gender extends AbstractAdValoramEntity {
 	public String gender;
 	public String genderCode;
 	
-/*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
-	public long getId() {
-		return id;
-	}*/
 	
 	@Column(name="gender")
 	public String getGender() {

@@ -1,5 +1,6 @@
 package com.onequbit.advaloram.hibernate.entity;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -10,7 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OrderBy;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -30,7 +31,8 @@ public class Product extends AbstractAdValoramEntity {
 	
 	//private Style styleCode;
 	public String styleCode;
-	public Set<Color> colorCodes;
+	//public Set<Color> colorCodes;
+	public Map<ColorCode, Color> colors;
 	public Set<Gender> genderCodes;
 	public Set<Size> sizeCodes;
 	public Season seasonCode;
@@ -39,31 +41,12 @@ public class Product extends AbstractAdValoramEntity {
 	public UnitOfMeasurement unitOfMeasurement;
 	public Integer mrp;
 	public Integer tradePrice;
-	public String eanCode;
 	public String productName;
 	public String status;
 	
-/*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="product_id")
-	public long getId() {
-		return id;
-	}*/
+	public Set<StockKeepingUnit> stockKeepingUnits;
 	
-/*	@ManyToOne(cascade = CascadeType.PERSIST)
-	@JoinColumn(name="style_code", nullable = true, referencedColumnName = "style_code")
-	public Style getStyleCode() {
-		return styleCode;
-	}*/
-	
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	@Fetch (FetchMode.SELECT)
-	@JoinColumn(name="color_code", nullable = true, referencedColumnName = "color_code")
-	//@OrderBy("uuidColumn")
-	public Set<Color> getColorCodes() {
-		return colorCodes;
-	}
-	
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@Fetch (FetchMode.SELECT)
 	@JoinTable(name = "product_gender", catalog = "public", joinColumns = {
 			@JoinColumn(name = "product_id", nullable = true, updatable = false) },
@@ -74,7 +57,7 @@ public class Product extends AbstractAdValoramEntity {
 	}
 	
 	
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@Fetch (FetchMode.SELECT)
 	@JoinTable(name = "product_size", catalog = "public", joinColumns = {
 			@JoinColumn(name = "product_id", nullable = true, updatable = false) },
@@ -84,28 +67,28 @@ public class Product extends AbstractAdValoramEntity {
 		return sizeCodes;
 	}
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="season_code", nullable = true, referencedColumnName = "season_code")
 	public Season getSeasonCode() {
 		return seasonCode;
 	}
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="brand_name", nullable = true, referencedColumnName = "brand_name")
 	public Brand getBrand() {
 		return brand;
 	}
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="category_name", nullable = true, referencedColumnName = "category_name")
 	public ProductCategory getProductCategory() {
 		return productCategory;
 	}
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@Fetch (FetchMode.SELECT)
 	@JoinColumn(name="uom_code", nullable = true, referencedColumnName = "uom_code")
 	public UnitOfMeasurement getUnitOfMeasurement() {
@@ -122,10 +105,6 @@ public class Product extends AbstractAdValoramEntity {
 		return tradePrice;
 	}
 	
-	@Column(name="ean_code")
-	public String getEanCode() {
-		return eanCode;
-	}
 	
 	@Column(name="product_name")
 	public String getProductName() {
@@ -136,21 +115,37 @@ public class Product extends AbstractAdValoramEntity {
 	public String getStatus() {
 		return status;
 	}
-/*	public void setId(long id) {
-		this.id = id;
-	}*/
-/*	public void setStyleCode(Style styleCode) {
-		this.styleCode = styleCode;
-	}*/
 	
 	
-	public void setColorCodes(Set<Color> colorCode) {
-		this.colorCodes = colorCode;
+	@OneToMany(mappedBy="product", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch (FetchMode.SELECT)
+	public Set<StockKeepingUnit> getStockKeepingUnits() {
+		return stockKeepingUnits;
 	}
-	@Column(name="style_code")
+
+
+	public void setStockKeepingUnits(Set<StockKeepingUnit> stockKeepingUnits) {
+		this.stockKeepingUnits = stockKeepingUnits;
+	}
+
+
+	@Column(name="style_code", unique = true)
 	public String getStyleCode() {
 		return styleCode;
 	}
+
+	//http://stackoverflow.com/questions/7525320/how-to-add-a-mapstring-person-in-an-entity-class
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+	@Fetch (FetchMode.SELECT)
+	public Map<ColorCode, Color> getColors() {
+		return colors;
+	}
+
+
+	public void setColors(Map<ColorCode, Color> colorCodes) {
+		this.colors = colorCodes;
+	}
+
 
 	public void setStyleCode(String styleCode) {
 		this.styleCode = styleCode;
@@ -181,9 +176,7 @@ public class Product extends AbstractAdValoramEntity {
 	public void setTradePrice(Integer tradePrice) {
 		this.tradePrice = tradePrice;
 	}
-	public void setEanCode(String eanCode) {
-		this.eanCode = eanCode;
-	}
+
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}

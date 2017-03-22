@@ -1,12 +1,7 @@
 package com.onequbit.advaloram.hibernate.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
@@ -20,12 +15,7 @@ public class UnitOfMeasurement extends AbstractAdValoramEntity {
 	//private long id;
 	public String description;
 	public String uomCode;
-	
-/*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
-	public long getId() {
-		return id;
-	}*/
+
 	
 	@Column(name="description")
 	public String getDescription() {
@@ -36,10 +26,7 @@ public class UnitOfMeasurement extends AbstractAdValoramEntity {
 	public String getUomCode() {
 		return uomCode;
 	}
-	
-/*	public void setId(long id) {
-		this.id = id;
-	}*/
+
 	
 	public void setDescription(String description) {
 		this.description = description;
