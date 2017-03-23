@@ -31,7 +31,7 @@ public class ProductDao {
 	
 	public static class Tag {
 		public static final String STYLE_CODE = "styleCode", SEASON_CODE = "seasonCode", BRAND = "brand", PRODUCT_CATEGORY = "productCategory", UOM = "unitOfMeasurement",
-				COLOR_CODES = "colorCodes", GENDER_CODES = "genderCodes", SIZE_CODES = "sizeCodes";
+				COLORS = "colors", GENDER_CODES = "genderCodes", SIZE_CODES = "sizeCodes";
 	}
 	
 	/**
@@ -132,7 +132,7 @@ public class ProductDao {
 				product.setProductCategory(session.load(ProductCategory.class, Long.parseLong(String.valueOf(productJson.get(Tag.PRODUCT_CATEGORY)))));
 				product.setUnitOfMeasurement(session.load(UnitOfMeasurement.class, Long.parseLong(String.valueOf(productJson.get(Tag.UOM)))));
 				
-				JSONArray colorCodesArray = productJson.getJSONArray(Tag.COLOR_CODES);
+				JSONArray colorCodesArray = productJson.getJSONArray(Tag.COLORS);
 				HashMap<ColorCode, Color> colors = new HashMap<>();
 				for(int c = 0; c < colorCodesArray.length(); c++){
 					JSONObject colorJson = colorCodesArray.getJSONObject(c);
@@ -191,7 +191,7 @@ public class ProductDao {
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
 			
-			JSONArray colorCodesArray = productJson.getJSONArray(Tag.COLOR_CODES);
+			JSONArray colorCodesArray = productJson.getJSONArray(Tag.COLORS);
 			HashMap<ColorCode, Color> colors = new HashMap<>();
 			for(int c = 0; c < colorCodesArray.length(); c++){
 				JSONObject colorJson = colorCodesArray.getJSONObject(c);

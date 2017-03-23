@@ -12,7 +12,7 @@ public class Gender extends AbstractAdValoramEntity {
 	 * 
 	 */
 	public static final long serialVersionUID = 7307264319663834608L;
-	//public long id;
+	public long id;
 	public String gender;
 	public String genderCode;
 	
@@ -27,9 +27,14 @@ public class Gender extends AbstractAdValoramEntity {
 		return genderCode;
 	}
 	
-/*	public void setId(long id) {
+	@Column(name="id")
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
 		this.id = id;
-	}*/
+	}
 	public void setGender(String gender) {
 		this.gender = gender;
 	}

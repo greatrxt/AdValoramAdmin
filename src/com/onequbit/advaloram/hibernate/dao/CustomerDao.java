@@ -138,7 +138,7 @@ public class CustomerDao {
 	 * @param customerJson
 	 * @return
 	 */
-	public static JSONObject createCustomer(Long id, JSONObject customerJson){
+	public static JSONObject createOrUpdateCustomer(Long id, JSONObject customerJson){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -153,7 +153,7 @@ public class CustomerDao {
 			
 			HibernateUtil.setDataFromJson(customer, customerJson);
 			
-			if(getCustomer(customer) != null){
+			if(getCustomer(customer) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "customer " + customerJson.toString() + " already exists");
 			} else {

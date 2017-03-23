@@ -17,23 +17,22 @@ public class Size extends AbstractAdValoramEntity {
 	 * 
 	 */
 	public static final long serialVersionUID = -4621899079285800805L;
-	//public long id;
+	public long id;
 	public String sizeCode;
 	
-/*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")
-	public long getId() {
+	public Long getId() {
 		return id;
-	}*/
+	}
 	
 	@Column(name="size_code")
 	public String getSizeCode() {
 		return sizeCode;
 	}
 	
-/*	public void setId(long id) {
+	public void setId(long id) {
 		this.id = id;
-	}*/
+	}
 	
 	public void setSizeCode(String sizeCode) {
 		this.sizeCode = sizeCode;

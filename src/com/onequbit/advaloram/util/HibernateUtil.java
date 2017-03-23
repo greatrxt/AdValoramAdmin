@@ -106,7 +106,8 @@ public class HibernateUtil {
 		for(int f = 0; f < fields.length; f++){
 			Field field = fields[f];
 			try {
-				if(field.getName().equals("serialVersionUID")){
+				if(field.getName().equals("serialVersionUID")
+						|| field.getName().equals("stockKeepingUnits")){
 					continue;
 				}
 				
@@ -116,16 +117,25 @@ public class HibernateUtil {
 					//if(field.getType().getName().equals(entityJson.get(field.getName()).getClass().getName())){
 					if(field.getType().isAssignableFrom(String.class)) {
 						field.set(entity, String.valueOf(entityObject));						
-					} else if (field.getType().isAssignableFrom(Long.class)){
+					} else if (field.getType().isAssignableFrom(long.class) 
+							|| field.getType().isAssignableFrom(Long.class)){
 						try {
 							field.set(entity, Long.parseLong(String.valueOf(entityObject)));
 						} catch(NumberFormatException n){
 							field.set(entity, 0);
 						}
 						
-					} else if (field.getType().isAssignableFrom(Integer.class)){
+					} else if (field.getType().isAssignableFrom(int.class) 
+							|| field.getType().isAssignableFrom(Integer.class)){
 						try {
 							field.set(entity, Integer.parseInt(String.valueOf(entityObject)));
+						} catch(NumberFormatException n){
+							field.set(entity, 0);
+						}
+					} else if (field.getType().isAssignableFrom(float.class) 
+							|| field.getType().isAssignableFrom(Float.class)){
+						try {
+							field.set(entity, Float.parseFloat(String.valueOf(entityObject)));
 						} catch(NumberFormatException n){
 							field.set(entity, 0);
 						}
@@ -198,7 +208,9 @@ public class HibernateUtil {
 					continue;
 				}
 				if(field.get(entity) == null){
-					entityJson.put(field.getName(), "No Data");
+					if(!entityJson.has(field.getName())){
+						entityJson.put(field.getName(), "No Data");
+					}
 					continue;
 				}
 				
