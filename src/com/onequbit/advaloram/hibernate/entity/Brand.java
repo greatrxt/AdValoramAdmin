@@ -12,9 +12,18 @@ public class Brand extends AbstractAdValoramEntity {
 	 * 
 	 */
 	public static final long serialVersionUID = -1744185554531654447L;
-
+	public long id;
 	
 	public String brandName;
+	
+	@Column(name="id")
+	public Long getId() {
+		return id;
+	}	
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
 	
 	@Column(name="brand_name")
 	public String getBrandName() {

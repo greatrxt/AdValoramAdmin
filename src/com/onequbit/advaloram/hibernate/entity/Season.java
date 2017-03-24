@@ -17,15 +17,14 @@ public class Season extends AbstractAdValoramEntity {
 	 * 
 	 */
 	public static final long serialVersionUID = -7095574745711279460L;
-	//private long id;
+	public long id;
 	public String code;
 	public String season;
 	
-/*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")
-	public long getId() {
+	public Long getId() {
 		return id;
-	}*/
+	}
 	
 	@Column(name="season_code")
 	public String getCode() {
@@ -37,9 +36,9 @@ public class Season extends AbstractAdValoramEntity {
 		return season;
 	}
 	
-/*	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
-	}*/
+	}
 	public void setCode(String code) {
 		this.code = code;
 	}

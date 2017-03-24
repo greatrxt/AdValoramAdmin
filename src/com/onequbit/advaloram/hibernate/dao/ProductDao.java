@@ -32,6 +32,9 @@ public class ProductDao {
 	public static class Tag {
 		public static final String STYLE_CODE = "styleCode", SEASON_CODE = "seasonCode", BRAND = "brand", PRODUCT_CATEGORY = "productCategory", UOM = "unitOfMeasurement",
 				COLORS = "colors", GENDER_CODES = "genderCodes", SIZE_CODES = "sizeCodes";
+		public static final class SKU {
+			public static final String EAN_CODE = "eanCode";
+		}
 	}
 	
 	/**
@@ -66,6 +69,38 @@ public class ProductDao {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param product
+	 * @return
+	 */
+	
+	public static StockKeepingUnit getStockKeepingUnit(StockKeepingUnit sku){
+
+		Session session = null;
+		try {
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(StockKeepingUnit.class);
+			criteria.add(Restrictions.eq(Tag.SKU.EAN_CODE, sku.getEanCode()).ignoreCase());
+
+			List<StockKeepingUnit> list = criteria.list();
+			if(list.size() > 0){
+				return list.iterator().next();
+			} 
+			
+		} catch(Exception e){
+			e.printStackTrace();
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return null;
+	}
 	/**
 	 * Get all Products
 	 * @return
@@ -110,23 +145,30 @@ public class ProductDao {
 	 * @param productJson
 	 * @return
 	 */
-	public static JSONObject createProduct(JSONObject productJson){
+	public static JSONObject createOrUpdateProduct(Long id, JSONObject productJson){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
+		Product product = null;
 		
-		try {			
-			Product product = new Product();
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			
+			if(id < 0){
+				product = new Product();
+			} else {
+				product = session.get(Product.class, id);
+			}
 			HibernateUtil.setDataFromJson(product, productJson);
 			
-			if(getProduct(product) != null){
+			if(getProduct(product) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "product " + productJson.toString() + " already exists");
 			} else {
 			
-				session = HibernateUtil.getSessionAnnotationFactory().openSession();
+				
 				session.beginTransaction();
-				product.setRecordCreationTime(SystemUtils.getFormattedDate());
+				
 				product.setSeasonCode(session.load(Season.class, Long.parseLong(String.valueOf(productJson.get(Tag.SEASON_CODE)))));
 				product.setBrand(session.load(Brand.class, Long.parseLong(String.valueOf(productJson.get(Tag.BRAND)))));
 				product.setProductCategory(session.load(ProductCategory.class, Long.parseLong(String.valueOf(productJson.get(Tag.PRODUCT_CATEGORY)))));
@@ -158,15 +200,23 @@ public class ProductDao {
 					sizes.add(session.load(Size.class, Long.parseLong(String.valueOf(sizeArray.get(s)))));
 				}
 				product.setSizeCodes(sizes);
-				session.save(product);
-				Long id = product.getId();
+				if(id < 0){
+					product.setRecordCreationTime(SystemUtils.getFormattedDate());
+					session.save(product);
+					
+					
+				} else {
+					session.update(product);
+				}
+				
 				session.getTransaction().commit();
 				
 				if(session!=null){
 					session.close();
 				}
-								
-				createStockKeepingUnitsFor(id, productJson);
+				
+				Long idForSku = product.getId();			
+				createStockKeepingUnitsFor(idForSku, productJson);
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}	
 			
@@ -232,8 +282,10 @@ public class ProductDao {
 						Size sizeCode = sizeCodes.next();
 						StockKeepingUnit sku = new StockKeepingUnit(styleCode, colorCode, genderCode, sizeCode);
 						sku.setProduct(product);
-						skus.add(sku);
-						session.save(sku);
+						if(getStockKeepingUnit(sku) == null){
+							skus.add(sku);
+							session.save(sku);
+						}
 					}
 				}
 			}	

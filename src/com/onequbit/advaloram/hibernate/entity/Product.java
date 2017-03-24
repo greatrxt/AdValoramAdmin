@@ -41,6 +41,7 @@ public class Product extends AbstractAdValoramEntity {
 	public UnitOfMeasurement unitOfMeasurement;
 	public Integer mrp;
 	public Integer tradePrice;
+	public Integer costPrice;
 	//public String productName;
 	public String status;
 	
@@ -104,7 +105,11 @@ public class Product extends AbstractAdValoramEntity {
 	public Integer getTradePrice() {
 		return tradePrice;
 	}
-	
+
+	@Column(name="cost_price")
+	public Integer getCostPrice() {
+		return costPrice;
+	}
 	
 	/*@Column(name="product_name")
 	public String getProductName() {
@@ -173,6 +178,11 @@ public class Product extends AbstractAdValoramEntity {
 	public void setMrp(Integer mrp) {
 		this.mrp = mrp;
 	}
+	
+	public void setCostPrice(Integer costPrice) {
+		this.costPrice = costPrice;
+	}
+	
 	public void setTradePrice(Integer tradePrice) {
 		this.tradePrice = tradePrice;
 	}
