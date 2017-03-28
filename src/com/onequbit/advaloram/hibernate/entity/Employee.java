@@ -17,7 +17,7 @@ public class Employee extends AbstractAdValoramEntity {
 	 */
 	public static final long serialVersionUID = -5059377149015218370L;
 
-	//public long id;
+	public long id;
 	
 	public String salutation, firstName, lastName, fatherName, motherName, permanentAddress, correspondenceAddress;
 	
@@ -38,16 +38,15 @@ public class Employee extends AbstractAdValoramEntity {
 	public String notes, filesMetadata;
 	
 	//public Date recordCreationTime;
-	
-/*	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+
 	@Column(name="id")
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	
 	public void setId(long id) {
 		this.id = id;
-	}*/
+	}
 
 	
 	@Column(name="salutation")

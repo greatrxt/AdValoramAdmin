@@ -1,6 +1,5 @@
 package com.onequbit.advaloram.hibernate.dao;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,18 +11,18 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.entity.Location;
-import com.onequbit.advaloram.hibernate.entity.Employee;
+import com.onequbit.advaloram.hibernate.entity.Tax;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
 
-public class EmployeeDao {
+public class TaxDao {
 	
 	/**
 	 * 
-	 * @param employee
+	 * @param tax
 	 * @return
 	 */
-	public static Employee getEmployee(Employee employee){
+	public static Tax getTax(Tax tax){
 
 		Session session = null;
 		try {
@@ -31,10 +30,10 @@ public class EmployeeDao {
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
 			
-			Criteria criteria = session.createCriteria(Employee.class);
-			criteria.add(Restrictions.eq("firstName", employee.getFirstName()).ignoreCase());
+			Criteria criteria = session.createCriteria(Tax.class);
+			criteria.add(Restrictions.eq("taxName", tax.getTaxName()).ignoreCase());
 
-			List<Employee> list = criteria.list();
+			List<Tax> list = criteria.list();
 			if(list.size() > 0){
 				return list.iterator().next();
 			} 
@@ -51,27 +50,27 @@ public class EmployeeDao {
 	}
 	
 	/**
-	 * Get all Employees
+	 * Get all Taxes
 	 * @return
 	 */
-	public static JSONObject getAllEmployees(){
+	public static JSONObject getAllTaxes(){
 		JSONObject resultsJson = new JSONObject();
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
 		try {
 						
-			List<Employee> employeesList = (List<Employee>)(Object)HibernateUtil.getAll(Employee.class);
+			List<Tax> taxesList = (List<Tax>)(Object)HibernateUtil.getAll(Tax.class);
 
-			if(employeesList.size() == 0){
-				//No Employee found
+			if(taxesList.size() == 0){
+				//No Tax found
 				resultsJson.put(Application.RESULT, Application.ERROR);
-				resultsJson.put(Application.ERROR_MESSAGE, "No Employee found");
+				resultsJson.put(Application.ERROR_MESSAGE, "No Tax found");
 			} else {
-				Iterator<Employee> iterator = employeesList.iterator();
+				Iterator<Tax> iterator = taxesList.iterator();
 				while(iterator.hasNext()){
-					Employee employee = iterator.next();
-					JSONObject employeeJson = HibernateUtil.getJsonFromHibernateEntity(employee);
-					resultArray.put(employeeJson);
+					Tax tax = iterator.next();
+					JSONObject taxJson = HibernateUtil.getJsonFromHibernateEntity(tax);
+					resultArray.put(taxJson);
 				}
 				resultsJson.put(Application.RESULT, resultArray);
 			}
@@ -91,42 +90,36 @@ public class EmployeeDao {
 	
 	/**
 	 * 
-	 * @param employeeJson
+	 * @param taxJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateEmployee(Long id, JSONObject employeeJson){
+	public static JSONObject createOrUpdateTax(Long id, JSONObject taxJson){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
-		Employee employee = null;
-		
+		Tax tax = null;
 		try {	
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
-			if(id < 0){
-				employee = new Employee();
-			} else {
-				employee = session.get(Employee.class, id);
-			}
-			HibernateUtil.setDataFromJson(employee, employeeJson);
+			session.beginTransaction();
 			
-			if(getEmployee(employee) != null && id < 0){
+			if(id > 0){
+				tax = session.get(Tax.class, id); 
+			} else {
+				tax = new Tax();
+			}			
+			
+			HibernateUtil.setDataFromJson(tax, taxJson);			
+			
+			if(getTax(tax) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
-				result.put(Application.ERROR_MESSAGE, "employee " + employeeJson.toString() + " already exists");
-			} else {
-			
-				session.beginTransaction();
-				employee.setCity(session.load(Location.class, Long.parseLong(employeeJson.getString("city"))));
-				if(!employeeJson.getString("reportingTo").trim().isEmpty()){
-					employee.setReportingTo(session.load(Employee.class, Long.parseLong(employeeJson.getString("reportingTo"))));
-				}
-			
-				if(id < 0){
-					employee.setRecordCreationTime(SystemUtils.getFormattedDate());					
-					session.save(employee);
+				result.put(Application.ERROR_MESSAGE, "tax " + taxJson.toString() + " already exists");
+			} else {			
+				if(id > 0){
+					session.update(tax);
 				} else {
-					session.update(employee);
+					tax.setRecordCreationTime(SystemUtils.getFormattedDate());	
+					session.save(tax);					
 				}
-									
 				session.getTransaction().commit();						
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		

@@ -24,8 +24,8 @@ public class RunIt {
 		session.beginTransaction();
 
 		Product stock = new Product();
-        stock.setProductName("MyJeans");
-        stock.setEanCode("5894375876578");        
+/*        stock.setProductName("MyJeans");
+        stock.setEanCode("5894375876578");        */
         
         stock.setBrand(session.load(Brand.class, Long.parseLong("1")));
         

@@ -19,21 +19,21 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
-import com.onequbit.advaloram.hibernate.dao.EmployeeDao;
+import com.onequbit.advaloram.hibernate.dao.TaxDao;
 import com.onequbit.advaloram.util.SystemUtils;
 
-@Path("employee")
-public class EmployeeService {
+@Path("tax")
+public class TaxService {
 
-	final static Logger logger = Logger.getLogger(EmployeeService.class);
+	final static Logger logger = Logger.getLogger(TaxService.class);
 	
 	@GET
-	public static Response getAllEmployees(@Context HttpServletRequest request, 
+	public static Response getAllTaxs(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = EmployeeDao.getAllEmployees();
+			result = TaxDao.getAllTaxes();
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -46,18 +46,18 @@ public class EmployeeService {
 	}
 	
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON)	
-	@Produces(MediaType.APPLICATION_JSON)	
-	public static Response createEmployee(@Context HttpServletRequest request, 
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response createTax(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to create employee. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to create tax. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = EmployeeDao.createOrUpdateEmployee((long) -1, inputStreamArray);
+			result = TaxDao.createOrUpdateTax((long) -1, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -71,18 +71,18 @@ public class EmployeeService {
 	
 	@PUT
 	@Path("/{id}")
-	@Consumes(MediaType.APPLICATION_JSON)	
-	@Produces(MediaType.APPLICATION_JSON)	
-	public static Response updateEmployee(@Context HttpServletRequest request, 
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response updateTax(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext, @PathParam("id") Long id){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to update employee. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to update tax. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = EmployeeDao.createOrUpdateEmployee(id, inputStreamArray);
+			result = TaxDao.createOrUpdateTax(id, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

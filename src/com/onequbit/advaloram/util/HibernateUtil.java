@@ -33,6 +33,7 @@ import com.onequbit.advaloram.hibernate.entity.ProductCategory;
 import com.onequbit.advaloram.hibernate.entity.Season;
 import com.onequbit.advaloram.hibernate.entity.Size;
 import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
+import com.onequbit.advaloram.hibernate.entity.Tax;
 import com.onequbit.advaloram.hibernate.entity.Transporter;
 import com.onequbit.advaloram.hibernate.entity.UnitOfMeasurement;
 import com.onequbit.advaloram.hibernate.entity.AdValUser;
@@ -106,7 +107,8 @@ public class HibernateUtil {
 		for(int f = 0; f < fields.length; f++){
 			Field field = fields[f];
 			try {
-				if(field.getName().equals("serialVersionUID")
+				if(field.getName().equals("serialVersionUID") 
+						|| field.getName().equals("id")
 						|| field.getName().equals("stockKeepingUnits")){
 					continue;
 				}
@@ -139,6 +141,13 @@ public class HibernateUtil {
 						} catch(NumberFormatException n){
 							field.set(entity, 0);
 						}
+					} else if (field.getType().isAssignableFrom(double.class) 
+							|| field.getType().isAssignableFrom(Double.class)){
+						try {
+							field.set(entity, Double.parseDouble(String.valueOf(entityObject)));
+						} catch(NumberFormatException n){
+							field.set(entity, 0);
+						}
 					} else if (field.getType().isPrimitive()){
 						field.set(entity, entityObject);	
 					} else if (field.getType().isAssignableFrom(Map.class)){
@@ -150,7 +159,7 @@ public class HibernateUtil {
 						System.out.println("Field " + field.getName() + " of class " + field.getType().getCanonicalName() + " could not be stored");
 					}
 				} else {
-					throw new Exception("Class " + field.getName() + " not found");
+					throw new Exception("Field " + field.getName() + " not found");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -307,6 +316,7 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(Size.class);
         	configuration.addAnnotatedClass(StockKeepingUnit.class);
         	//configuration.addAnnotatedClass(Style.class);
+        	configuration.addAnnotatedClass(Tax.class);
         	configuration.addAnnotatedClass(Transporter.class);
         	configuration.addAnnotatedClass(UnitOfMeasurement.class);        	
         	

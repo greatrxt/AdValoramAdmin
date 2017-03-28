@@ -24,6 +24,7 @@ import com.onequbit.advaloram.hibernate.entity.Season;
 import com.onequbit.advaloram.hibernate.entity.Size;
 import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
 import com.onequbit.advaloram.hibernate.entity.Style;
+import com.onequbit.advaloram.hibernate.entity.Tax;
 import com.onequbit.advaloram.hibernate.entity.Transporter;
 import com.onequbit.advaloram.hibernate.entity.UnitOfMeasurement;
 import com.onequbit.advaloram.util.HibernateUtil;
@@ -43,9 +44,10 @@ public class AbstractEntityDao {
 			SEASON = "season",
 			SIZE = "size",
 			STYLE = "style",
+			STOCK_KEEPING_UNIT = "stockKeepingUnit",
+			TAX = "tax",
 			TRANSPORTER = "transporter",
-			UNIT_OF_MEASUREMENT = "unitOfMeasurement",
-			STOCK_KEEPING_UNIT = "stockKeepingUnit";
+			UNIT_OF_MEASUREMENT = "unitOfMeasurement";
 	
 	/**
 	 * 
@@ -96,15 +98,19 @@ public class AbstractEntityDao {
 				case STYLE:
 					entity = HibernateUtil.getUsingId(Style.class, id);
 					break;
+				case STOCK_KEEPING_UNIT:
+					entity = HibernateUtil.getUsingId(StockKeepingUnit.class, id);
+					break;
+				case TAX:
+					entity = HibernateUtil.getUsingId(Tax.class, id);
+					break;
 				case TRANSPORTER:
 					entity = HibernateUtil.getUsingId(Transporter.class, id);
 					break;
 				case UNIT_OF_MEASUREMENT:
 					entity = HibernateUtil.getUsingId(UnitOfMeasurement.class, id);
 					break;
-				case STOCK_KEEPING_UNIT:
-					entity = HibernateUtil.getUsingId(StockKeepingUnit.class, id);
-					break;
+
 				default:
 					throw new Exception("Class" + entityClass + "not found");
 			}
@@ -178,8 +184,14 @@ public class AbstractEntityDao {
 				case SIZE:
 					entityList = (List<Object>)(Object)HibernateUtil.getAll(Size.class);
 					break;
+				case STOCK_KEEPING_UNIT:
+					entityList = (List<Object>)(Object)HibernateUtil.getAll(StockKeepingUnit.class);
+					break;
 				case STYLE:
 					entityList = (List<Object>)(Object)HibernateUtil.getAll(Style.class);
+					break;
+				case TAX:
+					entityList = (List<Object>)(Object)HibernateUtil.getAll(Tax.class);
 					break;
 				case TRANSPORTER:
 					entityList = (List<Object>)(Object)HibernateUtil.getAll(Transporter.class);
@@ -187,9 +199,7 @@ public class AbstractEntityDao {
 				case UNIT_OF_MEASUREMENT:
 					entityList = (List<Object>)(Object)HibernateUtil.getAll(UnitOfMeasurement.class);
 					break;
-				case STOCK_KEEPING_UNIT:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(StockKeepingUnit.class);
-					break;
+
 				default:
 					throw new Exception("Class" + entityClass + "not found");
 			}
