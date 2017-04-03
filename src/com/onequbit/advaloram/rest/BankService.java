@@ -28,6 +28,7 @@ public class BankService {
 	final static Logger logger = Logger.getLogger(BankService.class);
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllBanks(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;

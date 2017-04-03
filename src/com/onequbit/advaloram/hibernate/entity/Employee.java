@@ -1,12 +1,20 @@
 package com.onequbit.advaloram.hibernate.entity;
 
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "employee")
@@ -36,6 +44,8 @@ public class Employee extends AbstractAdValoramEntity {
 	public String bankName, bankAccountNumber, ifscCode, permanentAccountNumber, employeeProvidentFundNumber, universalAccountNumber;
 	
 	public String notes, filesMetadata;
+
+	private Set<File> associatedFiles;
 	
 	//public Date recordCreationTime;
 
@@ -293,7 +303,20 @@ public class Employee extends AbstractAdValoramEntity {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
+	
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch (FetchMode.SELECT)
+	@JoinTable(name = "employee_file", catalog = "public", joinColumns = { @JoinColumn(name = "employee_id", nullable = true, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "file_id", nullable = true, updatable = false) })
+	public Set<File> getAssociatedFiles() {
+		return associatedFiles;
+	}
+	
 
+	public void setAssociatedFiles(Set<File> associatedFiles) {
+		this.associatedFiles = associatedFiles;
+	}
+	
 	@Column(name="files_meta_data")
 	public String getFilesMetadata() {
 		return filesMetadata;
@@ -303,13 +326,4 @@ public class Employee extends AbstractAdValoramEntity {
 		this.filesMetadata = filesMetadata;
 	}
 
-/*	@Temporal(TemporalType.DATE)		//@Temporal: must be used with a java.util.Date field to specify the actual SQL type of the column
-	@Column(name="record_creation_time")
-	public Date getRecordCreationTime() {
-		return recordCreationTime;
-	}
-
-	public void setRecordCreationTime(Date recordCreationTime) {
-		this.recordCreationTime = recordCreationTime;
-	}*/
 }

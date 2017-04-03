@@ -28,6 +28,7 @@ public class TransporterService {
 	final static Logger logger = Logger.getLogger(TransporterService.class);
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllTransporters(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;

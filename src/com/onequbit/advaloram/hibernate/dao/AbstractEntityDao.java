@@ -16,6 +16,7 @@ import com.onequbit.advaloram.hibernate.entity.Brand;
 import com.onequbit.advaloram.hibernate.entity.Color;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
+import com.onequbit.advaloram.hibernate.entity.File;
 import com.onequbit.advaloram.hibernate.entity.Gender;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Product;
@@ -36,7 +37,8 @@ public class AbstractEntityDao {
 			BRAND = "brand", 
 			COLOR = "color", 
 			CUSTOMER = "customer", 
-			EMPLOYEE = "employee", 
+			EMPLOYEE = "employee",
+			FILE = "file",
 			GENDER = "gender", 
 			LOCATION = "location",
 			PRODUCT = "product",
@@ -51,80 +53,65 @@ public class AbstractEntityDao {
 	
 	/**
 	 * 
+	 * @param entityClassName
+	 * @return
+	 * @throws Exception 
+	 */
+	public static Class getClassByName(String entityClassName) throws Exception{
+		switch(entityClassName){
+			case BANK:				
+				return Bank.class;
+			case BRAND:
+				return Brand.class;
+			case COLOR:
+				return Color.class;
+			case CUSTOMER:
+				return Customer.class;
+			case EMPLOYEE:
+				return Employee.class;
+			case FILE:
+				return File.class;
+			case GENDER:
+				return Gender.class;
+			case LOCATION:
+				return Location.class;
+			case PRODUCT:
+				return Product.class;
+			case PRODUCT_CATEGORY:
+				return ProductCategory.class;
+			case SEASON:
+				return Season.class;
+			case SIZE:
+				return Size.class;
+			case STYLE:
+				return Style.class;
+			case STOCK_KEEPING_UNIT:
+				return StockKeepingUnit.class;
+			case TAX:
+				return Tax.class;
+			case TRANSPORTER:
+				return Transporter.class;
+			case UNIT_OF_MEASUREMENT:
+				return UnitOfMeasurement.class;
+		}
+		
+		throw new Exception("Class" + entityClassName + "not found");
+	}
+	/**
+	 * 
 	 * @param entityClass
 	 * @param id
 	 * @return
 	 */
-	public static JSONObject getEntityUsingId(String entityClass, long id){
+	public static JSONObject getEntityUsingId(String entityClassName, long id){
 		JSONObject resultsJson = new JSONObject();
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
 		try {
-			Object entity = null;			
-			switch(entityClass){
-				case BANK:				
-					entity = HibernateUtil.getUsingId(Bank.class, id);
-					break;
-				case BRAND:
-					entity = HibernateUtil.getUsingId(Brand.class, id);
-					break;
-				case COLOR:
-					entity = HibernateUtil.getUsingId(Color.class, id);
-					break;
-				case CUSTOMER:
-					entity = HibernateUtil.getUsingId(Customer.class, id);
-					break;
-				case EMPLOYEE:
-					entity = HibernateUtil.getUsingId(Employee.class, id);
-					break;
-				case GENDER:
-					entity = HibernateUtil.getUsingId(Gender.class, id);
-					break;
-				case LOCATION:
-					entity = HibernateUtil.getUsingId(Location.class, id);
-					break;
-				case PRODUCT:
-					entity = HibernateUtil.getUsingId(Product.class, id);
-					break;
-				case PRODUCT_CATEGORY:
-					entity = HibernateUtil.getUsingId(ProductCategory.class, id);
-					break;
-				case SEASON:
-					entity = HibernateUtil.getUsingId(Season.class, id);
-					break;
-				case SIZE:
-					entity = HibernateUtil.getUsingId(Size.class, id);
-					break;
-				case STYLE:
-					entity = HibernateUtil.getUsingId(Style.class, id);
-					break;
-				case STOCK_KEEPING_UNIT:
-					entity = HibernateUtil.getUsingId(StockKeepingUnit.class, id);
-					break;
-				case TAX:
-					entity = HibernateUtil.getUsingId(Tax.class, id);
-					break;
-				case TRANSPORTER:
-					entity = HibernateUtil.getUsingId(Transporter.class, id);
-					break;
-				case UNIT_OF_MEASUREMENT:
-					entity = HibernateUtil.getUsingId(UnitOfMeasurement.class, id);
-					break;
-
-				default:
-					throw new Exception("Class" + entityClass + "not found");
-			}
-			
-
-			if(entity == null){
-				//No Object found
-				resultsJson.put(Application.RESULT, Application.ERROR);
-				resultsJson.put(Application.ERROR_MESSAGE, "No "+ entityClass + " found");
-			} else {
-				JSONObject entityJson = HibernateUtil.getJsonFromHibernateEntity(entity);
-				resultArray.put(entityJson);				
-				resultsJson.put(Application.RESULT, resultArray);
-			}
+			Object entity = HibernateUtil.getUsingId(getClassByName(entityClassName), id);		
+			JSONObject entityJson = HibernateUtil.getJsonFromHibernateEntity(entity);
+			resultArray.put(entityJson);				
+			resultsJson.put(Application.RESULT, resultArray);
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -144,81 +131,21 @@ public class AbstractEntityDao {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static JSONObject getJsonForAll(String entityClass){
+	public static JSONObject getJsonForAll(String entityClassName){
 		JSONObject resultsJson = new JSONObject();
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
 		try {
-			List<Object> entityList = null;			
-			switch(entityClass){
-				case BANK:				
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Bank.class);
-					break;
-				case BRAND:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Brand.class);
-					break;
-				case COLOR:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Color.class);
-					break;
-				case CUSTOMER:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Customer.class);
-					break;
-				case EMPLOYEE:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Employee.class);
-					break;
-				case GENDER:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Gender.class);
-					break;
-				case LOCATION:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Location.class);
-					break;
-				case PRODUCT:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Product.class);
-					break;
-				case PRODUCT_CATEGORY:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(ProductCategory.class);
-					break;
-				case SEASON:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Season.class);
-					break;
-				case SIZE:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Size.class);
-					break;
-				case STOCK_KEEPING_UNIT:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(StockKeepingUnit.class);
-					break;
-				case STYLE:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Style.class);
-					break;
-				case TAX:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Tax.class);
-					break;
-				case TRANSPORTER:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(Transporter.class);
-					break;
-				case UNIT_OF_MEASUREMENT:
-					entityList = (List<Object>)(Object)HibernateUtil.getAll(UnitOfMeasurement.class);
-					break;
+			List<Object> entityList = (List<Object>)(Object)HibernateUtil.getAll(getClassByName(entityClassName));			
 
-				default:
-					throw new Exception("Class" + entityClass + "not found");
+			Iterator<Object> iterator = entityList.iterator();
+			while(iterator.hasNext()){
+				Object entity = iterator.next();
+				JSONObject entityJson = HibernateUtil.getJsonFromHibernateEntity(entity);
+				resultArray.put(entityJson);
 			}
-			
-
-			if(entityList.size() == 0){
-				//No Object found
-				resultsJson.put(Application.RESULT, Application.ERROR);
-				resultsJson.put(Application.ERROR_MESSAGE, "No "+ entityClass + " found");
-			} else {
-				Iterator<Object> iterator = entityList.iterator();
-				while(iterator.hasNext()){
-					Object entity = iterator.next();
-					JSONObject entityJson = HibernateUtil.getJsonFromHibernateEntity(entity);
-					resultArray.put(entityJson);
-				}
-				resultsJson.put(Application.RESULT, resultArray);
-			}
-			
+			resultsJson.put(Application.RESULT, resultArray);
+				
 		} catch(Exception e){
 			e.printStackTrace();
 			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());

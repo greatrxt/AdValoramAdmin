@@ -2,18 +2,25 @@ package com.onequbit.advaloram.hibernate.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "transporter")
@@ -43,6 +50,7 @@ public class Transporter extends AbstractAdValoramEntity {
 	public boolean taxIsInclusive, taxIsExclusive;
 	
 	public String notes, filesMetaData;
+	public Set<File> associatedFiles;
 	
 	//public Date recordCreationTime;
 	
@@ -101,7 +109,19 @@ public class Transporter extends AbstractAdValoramEntity {
 	public void setCity(Location city) {
 		this.city = city;
 	}
+	
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch (FetchMode.SELECT)
+	@JoinTable(name = "transporter_file", catalog = "public", joinColumns = { @JoinColumn(name = "transporter_id", nullable = true, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "file_id", nullable = true, updatable = false) })
+	public Set<File> getAssociatedFiles() {
+		return associatedFiles;
+	}
+	
 
+	public void setAssociatedFiles(Set<File> associatedFiles) {
+		this.associatedFiles = associatedFiles;
+	}
 	@Column(name="pin_code")
 	public String getPinCode() {
 		return pinCode;

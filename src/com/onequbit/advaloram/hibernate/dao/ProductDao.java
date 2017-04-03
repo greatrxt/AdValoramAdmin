@@ -202,9 +202,7 @@ public class ProductDao {
 				product.setSizeCodes(sizes);
 				if(id < 0){
 					product.setRecordCreationTime(SystemUtils.getFormattedDate());
-					session.save(product);
-					
-					
+					session.save(product);					
 				} else {
 					session.update(product);
 				}
@@ -217,7 +215,8 @@ public class ProductDao {
 				
 				Long idForSku = product.getId();			
 				createStockKeepingUnitsFor(idForSku, productJson);
-				result.put(Application.RESULT, Application.SUCCESS);				
+				result.put(Application.RESULT, Application.SUCCESS);	
+				result.put(Application.OBJECT_ID, idForSku);
 			}	
 			
 		} catch(Exception e){
@@ -284,6 +283,7 @@ public class ProductDao {
 						sku.setProduct(product);
 						if(getStockKeepingUnit(sku) == null){
 							skus.add(sku);
+							sku.setRecordCreationTime(SystemUtils.getFormattedDate());
 							session.save(sku);
 						}
 					}

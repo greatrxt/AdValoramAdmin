@@ -28,6 +28,7 @@ public class TaxService {
 	final static Logger logger = Logger.getLogger(TaxService.class);
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllTaxs(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;

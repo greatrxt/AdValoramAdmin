@@ -30,6 +30,7 @@ public class ProductService {
 	final static Logger logger = Logger.getLogger(ProductService.class);
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllProducts(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
@@ -96,10 +97,4 @@ public class ProductService {
 		return Response.status(Response.Status.OK).entity(result.toString()).build();
 	}
 	
-	@Path("/test")
-	@GET
-	public static Response test(@Context HttpServletRequest request, @Context ServletContext context){
-		RunIt.main();
-		return Response.status(Response.Status.OK).entity("fn").build();
-	}
 }

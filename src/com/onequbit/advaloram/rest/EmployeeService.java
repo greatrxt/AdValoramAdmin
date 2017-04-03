@@ -28,6 +28,7 @@ public class EmployeeService {
 	final static Logger logger = Logger.getLogger(EmployeeService.class);
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllEmployees(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;

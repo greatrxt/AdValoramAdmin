@@ -1,12 +1,20 @@
 package com.onequbit.advaloram.hibernate.entity;
 
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "customer")
@@ -25,7 +33,7 @@ public class Customer extends AbstractAdValoramEntity {
 	public Customer linkedBroker;
 	public String billingAddress;
 	public String deliveryAddress;
-	
+	public Set<File> associatedFiles;
 	public Location city; //not saving district and state. Can be figured out from location
 	public String pinCode;
 	
@@ -186,7 +194,16 @@ public class Customer extends AbstractAdValoramEntity {
 	public void setFilesMetaData(String filesMetaData) {
 		this.filesMetaData = filesMetaData;
 	}
-
+	
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch (FetchMode.SELECT)
+	@JoinTable(name = "customer_file", catalog = "public", joinColumns = { @JoinColumn(name = "customer_id", nullable = true, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "file_id", nullable = true, updatable = false) })
+	public Set<File> getAssociatedFiles() {
+		return associatedFiles;
+	}
+	
+	
 /*	@Temporal(TemporalType.DATE)		//@Temporal: must be used with a java.util.Date field to specify the actual SQL type of the column
 	@Column(name="record_creation_time")
 	public Date getRecordCreationTime() {
@@ -196,6 +213,10 @@ public class Customer extends AbstractAdValoramEntity {
 	public void setRecordCreationTime(Date recordCreationTime) {
 		this.recordCreationTime = recordCreationTime;
 	}*/
+
+	public void setAssociatedFiles(Set<File> associatedFiles) {
+		this.associatedFiles = associatedFiles;
+	}
 
 	@Column(name="mark_down")
 	public float getMarkDown() {

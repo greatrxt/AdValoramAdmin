@@ -34,6 +34,7 @@ public class Product extends AbstractAdValoramEntity {
 	//public Set<Color> colorCodes;
 	public Map<ColorCode, Color> colors;
 	public Set<Gender> genderCodes;
+	public Set<File> associatedFiles;
 	public Set<Size> sizeCodes;
 	public Season seasonCode;
 	public Brand brand;
@@ -87,6 +88,14 @@ public class Product extends AbstractAdValoramEntity {
 	@JoinColumn(name="category_name", nullable = true, referencedColumnName = "category_name")
 	public ProductCategory getProductCategory() {
 		return productCategory;
+	}
+
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch (FetchMode.SELECT)
+	@JoinTable(name = "product_file", catalog = "public", joinColumns = { @JoinColumn(name = "product_id", nullable = true, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "file_id", nullable = true, updatable = false) })
+	public Set<File> getAssociatedFiles() {
+		return associatedFiles;
 	}
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
@@ -192,6 +201,10 @@ public class Product extends AbstractAdValoramEntity {
 	}*/
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public void setAssociatedFiles(Set<File> associatedFiles) {
+		this.associatedFiles = associatedFiles;
 	}
 	
 	

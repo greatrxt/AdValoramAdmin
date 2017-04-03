@@ -8,6 +8,7 @@ import com.onequbit.advaloram.util.HibernateUtil;
 public class Application implements ServletContextListener{
 
 	public static final String RESULT = "result";
+	public static final String OBJECT_ID = "objectId";
 	public static final String ERROR = "error";
 	public static final String ERROR_MESSAGE = "error_message";
 	public static final String SUCCESS = "success";

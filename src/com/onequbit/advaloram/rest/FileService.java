@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.dao.FileDao;
 
 @Path("upload")	//same as UPLOAD_FOLDER_NAME
 public class FileService {
@@ -37,7 +38,7 @@ public class FileService {
 	@GET  
     @Path("/{entityClass}/{id}/{fileName}")  
     public Response getFile(@Context ServletContext servletContext, 
-    		@PathParam("entityClass") String entityClass,  @PathParam("id") String id, @PathParam("fileName") String fileName) { 
+    		@PathParam("entityClass") String entityClass,  @PathParam("id") Long id, @PathParam("fileName") String fileName) { 
 		
 		File uploadFolder = 
 				new File(servletContext.getRealPath(UPLOAD_FOLDER_NAME) + File.separator + entityClass + File.separator + id);
@@ -54,7 +55,7 @@ public class FileService {
     @Path("/{entityClass}/{id}")  
 	@Produces(MediaType.APPLICATION_JSON)
     public Response listFiles(@Context ServletContext servletContext, @Context UriInfo uriInfo,
-    		@PathParam("entityClass") String entityClass,  @PathParam("id") String id) { 
+    		@PathParam("entityClass") String entityClass,  @PathParam("id") Long id) { 
 		
 		JSONObject result = new JSONObject();
 		
@@ -96,9 +97,9 @@ public class FileService {
     @Consumes(MediaType.MULTIPART_FORM_DATA)  
 	@Produces(MediaType.APPLICATION_JSON)
     public Response uploadFile(  
-            @FormDataParam("file") InputStream uploadedInputStream,  
+            @FormDataParam("file") InputStream uploadedInputStream, @Context UriInfo uriInfo,  
             @FormDataParam("file") FormDataContentDisposition fileDetail, @Context ServletContext servletContext,
-            @PathParam("entityClass") String entityClass,  @PathParam("id") String id) {  
+            @PathParam("entityClass") String entityClass,  @PathParam("id") Long id) {  
 
 			JSONObject result = new JSONObject();
 		
@@ -110,7 +111,7 @@ public class FileService {
 				uploadFolder.mkdirs();
 			}
 			
-            String fileLocation = uploadFolder.getAbsolutePath() + File.separator + + System.currentTimeMillis() +  "_" + fileDetail.getFileName();  
+            String fileLocation = uploadFolder.getAbsolutePath() + File.separator + fileDetail.getFileName();  
                     //saving file  
             try {  
                 FileOutputStream out = new FileOutputStream(new File(fileLocation));  
@@ -122,6 +123,10 @@ public class FileService {
                 }  
                 out.flush();  
                 out.close(); 
+                
+                URI baseUri = uriInfo.getBaseUri();
+                String fileUri = baseUri + UPLOAD_FOLDER_NAME + "/" + entityClass + "/" + id + "/" + fileDetail.getFileName();
+                FileDao.makeEntry(entityClass, id, fileDetail.getFileName(), fileUri);
     			result.put(Application.RESULT, "Successfully uploaded to "+ fileLocation);
     		} catch (Exception e) {
     			result = new JSONObject();

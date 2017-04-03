@@ -28,6 +28,7 @@ public class LocationService {
 	final static Logger logger = Logger.getLogger(LocationService.class);
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllLocations(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
@@ -47,6 +48,7 @@ public class LocationService {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response createLocation(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		

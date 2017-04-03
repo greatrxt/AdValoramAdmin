@@ -26,6 +26,7 @@ import com.onequbit.advaloram.hibernate.entity.Color;
 import com.onequbit.advaloram.hibernate.entity.ColorCode;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
+import com.onequbit.advaloram.hibernate.entity.File;
 import com.onequbit.advaloram.hibernate.entity.Gender;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Product;
@@ -109,7 +110,8 @@ public class HibernateUtil {
 			try {
 				if(field.getName().equals("serialVersionUID") 
 						|| field.getName().equals("id")
-						|| field.getName().equals("stockKeepingUnits")){
+						|| field.getName().equals("stockKeepingUnits") 
+						|| field.getName().equals("associatedFiles")){
 					continue;
 				}
 				
@@ -308,6 +310,7 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(ColorCode.class);
         	configuration.addAnnotatedClass(Customer.class);
         	configuration.addAnnotatedClass(Employee.class);
+        	configuration.addAnnotatedClass(File.class);
         	configuration.addAnnotatedClass(Gender.class);
         	configuration.addAnnotatedClass(Location.class);
         	configuration.addAnnotatedClass(Product.class);
