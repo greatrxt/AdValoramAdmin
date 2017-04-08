@@ -84,7 +84,7 @@ public class Customer extends AbstractAdValoramEntity {
 		this.companyName = companyName;
 	}
 
-	@OneToOne(cascade = CascadeType.DETACH)
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="linked_distributor", nullable = true, referencedColumnName = "id")
 	public Customer getLinkedDistributor() {
 		return linkedDistributor;
@@ -94,7 +94,7 @@ public class Customer extends AbstractAdValoramEntity {
 		this.linkedDistributor = linkedDistributor;
 	}
 
-	@OneToOne(cascade = CascadeType.DETACH)
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="linked_broker", nullable = true, referencedColumnName = "id")
 	public Customer getLinkedBroker() {
 		return linkedBroker;

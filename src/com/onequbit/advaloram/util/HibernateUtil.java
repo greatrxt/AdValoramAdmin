@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -58,8 +61,17 @@ public class HibernateUtil {
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
 			
-			Criteria criteria = session.createCriteria(entity);			
+			/* Deprecated. Hence commented out.
+			 */Criteria criteria = session.createCriteria(entity);			
 			List<Object> list = criteria.list();
+			
+
+			/*// Create CriteriaBuilder
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+
+			// Create CriteriaQuery
+			CriteriaQuery<Object> criteria = builder.createQuery(entity);
+			List<Object> list = session.createQuery(criteria).getResultList();*/
 			return list;
 			
 		} catch (Exception e){

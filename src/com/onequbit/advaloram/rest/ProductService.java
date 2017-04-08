@@ -48,6 +48,26 @@ public class ProductService {
 		return Response.status(Response.Status.OK).entity(result.toString()).build();
 	}
 	
+	@GET
+	@Path("/style")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getAllStyles(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = ProductDao.getAllStyleCodes();
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

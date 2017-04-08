@@ -9,7 +9,9 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -101,6 +103,52 @@ public class ProductDao {
 		
 		return null;
 	}
+
+	/**
+	 * Get all Products
+	 * @return
+	 */
+	public static JSONObject getAllStyleCodes(){
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {		
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(Product.class);
+			criteria.setProjection(Projections.projectionList().add(Projections.property("id")).add(Projections.property("styleCode")));
+			List styleCodes = criteria.list();		
+
+			if(styleCodes.size() == 0){
+				//No Product found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No Style Codes Found");
+			} else {
+				Iterator iterator = styleCodes.iterator();
+				while(iterator.hasNext()){
+					JSONObject styleCode = new JSONObject();
+					Object[] result = (Object[]) iterator.next();
+					
+					styleCode.put("id", result[0]);
+					styleCode.put("styleCode", result[1]);
+					resultArray.put(styleCode);
+				}
+				resultsJson.put(Application.RESULT, resultArray);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+	
 	/**
 	 * Get all Products
 	 * @return
