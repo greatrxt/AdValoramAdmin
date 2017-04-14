@@ -21,6 +21,7 @@ import com.onequbit.advaloram.hibernate.entity.Gender;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.ProductCategory;
+import com.onequbit.advaloram.hibernate.entity.SalesOrder;
 import com.onequbit.advaloram.hibernate.entity.Season;
 import com.onequbit.advaloram.hibernate.entity.Size;
 import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
@@ -42,7 +43,8 @@ public class AbstractEntityDao {
 			GENDER = "gender", 
 			LOCATION = "location",
 			PRODUCT = "product",
-			PRODUCT_CATEGORY = "product_category",
+			PRODUCT_CATEGORY = "productCategory",
+			SALES_ORDER = "salesOrder",
 			SEASON = "season",
 			SIZE = "size",
 			STYLE = "style",
@@ -79,6 +81,8 @@ public class AbstractEntityDao {
 				return Product.class;
 			case PRODUCT_CATEGORY:
 				return ProductCategory.class;
+			case SALES_ORDER:
+				return SalesOrder.class;
 			case SEASON:
 				return Season.class;
 			case SIZE:

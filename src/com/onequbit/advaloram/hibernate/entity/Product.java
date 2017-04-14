@@ -49,7 +49,7 @@ public class Product extends AbstractAdValoramEntity {
 	public Set<StockKeepingUnit> stockKeepingUnits;
 	
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinTable(name = "product_gender", catalog = "public", joinColumns = {
 			@JoinColumn(name = "product_id", nullable = true, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "gender_code",
@@ -60,7 +60,7 @@ public class Product extends AbstractAdValoramEntity {
 	
 	
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinTable(name = "product_size", catalog = "public", joinColumns = {
 			@JoinColumn(name = "product_id", nullable = true, updatable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "size_code",
@@ -70,28 +70,28 @@ public class Product extends AbstractAdValoramEntity {
 	}
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name="season_code", nullable = true, referencedColumnName = "season_code")
 	public Season getSeasonCode() {
 		return seasonCode;
 	}
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name="brand_name", nullable = true, referencedColumnName = "brand_name")
 	public Brand getBrand() {
 		return brand;
 	}
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name="category_name", nullable = true, referencedColumnName = "category_name")
 	public ProductCategory getProductCategory() {
 		return productCategory;
 	}
 
 	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinTable(name = "product_file", catalog = "public", joinColumns = { @JoinColumn(name = "product_id", nullable = true, updatable = false) }, 
 			inverseJoinColumns = { @JoinColumn(name = "file_id", nullable = true, updatable = false) })
 	public Set<File> getAssociatedFiles() {
@@ -99,7 +99,7 @@ public class Product extends AbstractAdValoramEntity {
 	}
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name="uom_code", nullable = true, referencedColumnName = "uom_code")
 	public UnitOfMeasurement getUnitOfMeasurement() {
 		return unitOfMeasurement;
@@ -132,7 +132,7 @@ public class Product extends AbstractAdValoramEntity {
 	
 	
 	@OneToMany(mappedBy="product", cascade=CascadeType.ALL, fetch = FetchType.EAGER)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	public Set<StockKeepingUnit> getStockKeepingUnits() {
 		return stockKeepingUnits;
 	}
@@ -150,7 +150,7 @@ public class Product extends AbstractAdValoramEntity {
 
 	//http://stackoverflow.com/questions/7525320/how-to-add-a-mapstring-person-in-an-entity-class
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	public Map<ColorCode, Color> getColors() {
 		return colors;
 	}

@@ -71,38 +71,7 @@ public class ProductDao {
 		return null;
 	}
 	
-	/**
-	 * 
-	 * @param product
-	 * @return
-	 */
-	
-	public static StockKeepingUnit getStockKeepingUnit(StockKeepingUnit sku){
 
-		Session session = null;
-		try {
-			
-			session = HibernateUtil.getSessionAnnotationFactory().openSession();
-			session.beginTransaction();
-			
-			Criteria criteria = session.createCriteria(StockKeepingUnit.class);
-			criteria.add(Restrictions.eq(Tag.SKU.EAN_CODE, sku.getEanCode()).ignoreCase());
-
-			List<StockKeepingUnit> list = criteria.list();
-			if(list.size() > 0){
-				return list.iterator().next();
-			} 
-			
-		} catch(Exception e){
-			e.printStackTrace();
-		} finally {
-			if(session!=null){
-				session.close();
-			}
-		}
-		
-		return null;
-	}
 
 	/**
 	 * Get all Products
@@ -329,7 +298,7 @@ public class ProductDao {
 						Size sizeCode = sizeCodes.next();
 						StockKeepingUnit sku = new StockKeepingUnit(styleCode, colorCode, genderCode, sizeCode);
 						sku.setProduct(product);
-						if(getStockKeepingUnit(sku) == null){
+						if(StockKeepingUnitDao.getStockKeepingUnit(sku) == null){
 							skus.add(sku);
 							sku.setRecordCreationTime(SystemUtils.getFormattedDate());
 							session.save(sku);

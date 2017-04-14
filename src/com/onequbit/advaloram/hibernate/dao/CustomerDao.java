@@ -6,12 +6,14 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.entity.Location;
+import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
@@ -48,6 +50,52 @@ public class CustomerDao {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static JSONObject getAllCustomersIdAndName(){
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {		
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(Customer.class);
+			criteria.setProjection(Projections.projectionList().add(Projections.property("id")).add(Projections.property("companyName")));
+			List<Customer> styleCodes = criteria.list();		
+
+			if(styleCodes.size() == 0){
+				//No Customer found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No Customers Found");
+			} else {
+				Iterator iterator = styleCodes.iterator();
+				while(iterator.hasNext()){
+					JSONObject customer = new JSONObject();
+					Object[] result = (Object[]) iterator.next();
+					
+					customer.put("id", result[0]);
+					customer.put("companyName", result[1]);
+					resultArray.put(customer);
+				}
+				
+				resultsJson.put(Application.RESULT, resultArray);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
 	}
 	
 	/**

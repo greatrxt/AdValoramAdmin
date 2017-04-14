@@ -45,7 +45,7 @@ public class Employee extends AbstractAdValoramEntity {
 	
 	public String notes, filesMetadata;
 
-	private Set<File> associatedFiles;
+	public Set<File> associatedFiles;
 	
 	//public Date recordCreationTime;
 

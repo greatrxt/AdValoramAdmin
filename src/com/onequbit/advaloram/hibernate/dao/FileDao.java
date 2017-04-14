@@ -11,6 +11,7 @@ import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.File;
 import com.onequbit.advaloram.hibernate.entity.Product;
+import com.onequbit.advaloram.hibernate.entity.SalesOrder;
 import com.onequbit.advaloram.hibernate.entity.Transporter;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
@@ -71,6 +72,14 @@ public class FileDao {
 					}
 					associatedFiles.add(file);
 					employee.setAssociatedFiles(associatedFiles);
+				} else if(entity instanceof SalesOrder){
+					SalesOrder salesOrder =  ((SalesOrder) entity);
+					Set<File> associatedFiles = salesOrder.getAssociatedFiles(); 
+					if(associatedFiles == null){
+						associatedFiles = new HashSet<>();
+					}
+					associatedFiles.add(file);
+					salesOrder.setAssociatedFiles(associatedFiles);
 				}
 				
 				session.beginTransaction();

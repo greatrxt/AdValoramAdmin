@@ -34,6 +34,8 @@ import com.onequbit.advaloram.hibernate.entity.Gender;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.ProductCategory;
+import com.onequbit.advaloram.hibernate.entity.SalesOrder;
+import com.onequbit.advaloram.hibernate.entity.SalesOrderEntry;
 import com.onequbit.advaloram.hibernate.entity.Season;
 import com.onequbit.advaloram.hibernate.entity.Size;
 import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
@@ -127,6 +129,18 @@ public class HibernateUtil {
 					continue;
 				}
 				
+				if(entity instanceof SalesOrder && (
+						field.getName().equals("salesOrderId")
+						|| field.getName().equals("linkedCustomer")
+						|| field.getName().equals("clientNameOnSalesOrderDate")
+						|| field.getName().equals("referredByEmployee")
+						|| field.getName().equals("entry")
+						|| field.getName().equals("status")
+						|| field.getName().equals("salesOrderRevisionNumber")
+						|| field.getName().equals("salesOrderDate"))){
+					continue;
+				}
+				
 				if(entityJson.has(field.getName())){
 					System.out.println("Storing "+ "Field " + field.getName() + " of class " + field.getType().getCanonicalName());
 					Object entityObject = entityJson.get(field.getName());
@@ -174,6 +188,7 @@ public class HibernateUtil {
 					}
 				} else {
 					throw new Exception("Field " + field.getName() + " not found");
+					//System.out.println("Field " + field.getName() + " not found");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -215,6 +230,13 @@ public class HibernateUtil {
 					continue;
 				}
 				
+				if(field.get(entity) == null){
+					if(!entityJson.has(field.getName())){
+						entityJson.put(field.getName(), "No Data");
+					}
+					continue;
+				}
+				
 				//circular reference
 				if((entity instanceof Employee && field.getType().isAssignableFrom(Employee.class))){
 						entityJson.put(field.getName(), ((Employee)field.get(entity)).getId());
@@ -228,14 +250,15 @@ public class HibernateUtil {
 				}
 				if(entity instanceof StockKeepingUnit && field.getType().isAssignableFrom(Product.class)){
 					entityJson.put(field.getName(), ((Product)field.get(entity)).getId());
+					entityJson.put("mrp", ((Product)field.get(entity)).getMrp());
 					continue;
 				}
-				if(field.get(entity) == null){
-					if(!entityJson.has(field.getName())){
-						entityJson.put(field.getName(), "No Data");
-					}
+				
+				if(entity instanceof SalesOrder && field.getType().isAssignableFrom(SalesOrder.Status.class)){
+					entityJson.put(field.getName(), field.get(entity));
 					continue;
 				}
+				
 				
 				if(field.getType().isAssignableFrom(String.class) || 
 						field.getType().isAssignableFrom(Long.class) ||
@@ -328,6 +351,8 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(Product.class);
         	configuration.addAnnotatedClass(ProductCategory.class);
         	configuration.addAnnotatedClass(Season.class);
+        	configuration.addAnnotatedClass(SalesOrder.class);
+        	configuration.addAnnotatedClass(SalesOrderEntry.class);
         	configuration.addAnnotatedClass(Size.class);
         	configuration.addAnnotatedClass(StockKeepingUnit.class);
         	//configuration.addAnnotatedClass(Style.class);

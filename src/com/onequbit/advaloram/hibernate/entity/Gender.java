@@ -17,12 +17,12 @@ public class Gender extends AbstractAdValoramEntity {
 	public String genderCode;
 	
 	
-	@Column(name="gender")
+	@Column(name="gender", unique = true)
 	public String getGender() {
 		return gender;
 	}
 	
-	@Column(name="gender_code")
+	@Column(name="gender_code", unique = true)
 	public String getGenderCode() {
 		return genderCode;
 	}

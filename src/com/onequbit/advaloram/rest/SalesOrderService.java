@@ -19,23 +19,22 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
-import com.onequbit.advaloram.hibernate.dao.CustomerDao;
+import com.onequbit.advaloram.hibernate.dao.SalesOrderDao;
 import com.onequbit.advaloram.util.SystemUtils;
 
-@Path("customer")
-public class CustomerService {
+@Path("salesOrder")
+public class SalesOrderService {
 
-	final static Logger logger = Logger.getLogger(CustomerService.class);
+	final static Logger logger = Logger.getLogger(SalesOrderService.class);
 	
 	@GET
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getAllCustomers(@Context HttpServletRequest request, 
+	public static Response getAllSalesOrders(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = CustomerDao.getAllCustomers();
+			result = SalesOrderDao.getAllSalesOrders();
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -48,36 +47,14 @@ public class CustomerService {
 	}
 	
 	@GET
-	@Path("/idNameList")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/nextid")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getAllCustomersIdAndName(@Context HttpServletRequest request, 
+	public static Response getNextSalesOrderId(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = CustomerDao.getAllCustomersIdAndName();
-		} catch (Exception e) {
-			result = new JSONObject();
-			result.put(Application.RESULT, Application.ERROR);
-			result.put(Application.ERROR_MESSAGE, e.getMessage());
-			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
-		}
-		
-		return Response.status(Response.Status.OK).entity(result.toString()).build();
-	}
-	
-	@GET
-	@Path("/{type}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getAllCustomersOfType(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext,  @PathParam("type") String type){
-		JSONObject result;
-		try {
-			result = new JSONObject();
-			result = CustomerDao.getAllCustomersOfType(type);
+			result = SalesOrderDao.getNextSalesOrderId();
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -92,16 +69,16 @@ public class CustomerService {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response createCustomer(@Context HttpServletRequest request, 
+	public static Response createSalesOrder(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to create customer. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to create salesOrder. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = CustomerDao.createOrUpdateCustomer((long) -1, inputStreamArray);
+			result = SalesOrderDao.createOrUpdateSalesOrder((long) -1, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -117,16 +94,16 @@ public class CustomerService {
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response updateCustomer(@Context HttpServletRequest request, 
+	public static Response updateSalesOrder(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext, @PathParam("id") Long id){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to update customer. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to update salesOrder. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = CustomerDao.createOrUpdateCustomer(id, inputStreamArray);
+			result = SalesOrderDao.createOrUpdateSalesOrder(id, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

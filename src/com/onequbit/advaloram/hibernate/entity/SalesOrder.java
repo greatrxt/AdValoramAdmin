@@ -2,16 +2,20 @@ package com.onequbit.advaloram.hibernate.entity;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -58,7 +62,7 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	
 	public Employee referredByEmployee;
 	
-	public HashMap<StockKeepingUnit, Long> itemsList;
+	public Set<SalesOrderEntry> entry;
 	
 	public float markDownOnSalesOrderDate;
 	
@@ -71,6 +75,12 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	public String notes;
 	
 	public Set<File> associatedFiles;
+	
+	public Status status;
+	
+	public enum Status {
+		OPEN, CONFIRMED, DISPATCHED, CANCELLED 
+	}
 	
 	@Column(name="sales_order_id")
 	public long getSalesOrderId() {
@@ -154,10 +164,12 @@ public class SalesOrder extends AbstractAdValoramEntity {
 		return referredByEmployee;
 	}
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
-	public HashMap<StockKeepingUnit, Long> getItemsList() {
-		return itemsList;
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch (FetchMode.JOIN)
+	@JoinTable(name = "salesorder_entry_mapping", joinColumns = { @JoinColumn(name = "sales_order_id", nullable = false, updatable = false) }, 
+			inverseJoinColumns = { @JoinColumn(name = "entry_id", nullable = false, updatable = false) })
+	public Set<SalesOrderEntry> getEntry() {
+		return entry;
 	}
 
 	@Column(name="mark_down_on_sales_order_date")
@@ -191,6 +203,15 @@ public class SalesOrder extends AbstractAdValoramEntity {
 			inverseJoinColumns = { @JoinColumn(name = "file_id", nullable = false, updatable = false) })
 	public Set<File> getAssociatedFiles() {
 		return associatedFiles;
+	}
+
+	@Enumerated(EnumType.STRING)
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 	public void setSalesOrderId(long salesOrderId) {
@@ -257,8 +278,9 @@ public class SalesOrder extends AbstractAdValoramEntity {
 		this.referredByEmployee = referredByEmployee;
 	}
 
-	public void setItemsList(HashMap<StockKeepingUnit, Long> itemsList) {
-		this.itemsList = itemsList;
+
+	public void setEntry(Set<SalesOrderEntry> entry) {
+		this.entry = entry;
 	}
 
 	public void setMarkDownOnSalesOrderDate(float markDownOnSalesOrderDate) {

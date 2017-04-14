@@ -34,7 +34,7 @@ public class StockKeepingUnit extends AbstractAdValoramEntity {
 	
 	public Long quantityInStock;
 
-	public StockKeepingUnit(){
+	private StockKeepingUnit(){
 		super();
 		this.quantityInStock = (long) 0;
 	}
@@ -44,10 +44,15 @@ public class StockKeepingUnit extends AbstractAdValoramEntity {
 		this.colorCode = colorCode;
 		this.genderCode = genderCode;
 		this.sizeCode = sizeCode;
-		this.eanCode = colorCode.getColorCode() + styleCode + sizeCode.getSizeCode() + genderCode.getGenderCode(); //colorCode + styleCode + "28" + gender;
+		this.eanCode = generateEanCode(colorCode.getColorCode(), styleCode, sizeCode.getSizeCode(), genderCode.getGenderCode()); //colorCode + styleCode + "28" + gender;
 		this.quantityInStock = (long) 0;
 	}
 	
+
+	public static String generateEanCode(String colorCode, String styleCode, String sizeCode, String genderCode) {
+		return colorCode + styleCode + sizeCode + genderCode;
+	}
+
 	@Column(name = "style_code")
 	public String getStyleCode() {
 		return styleCode;
@@ -58,7 +63,7 @@ public class StockKeepingUnit extends AbstractAdValoramEntity {
 	}
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name="color_code", nullable = false, referencedColumnName = "color_code")
 	public ColorCode getColorCode() {
 		return colorCode;
@@ -69,7 +74,7 @@ public class StockKeepingUnit extends AbstractAdValoramEntity {
 	}
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name="gender", nullable = false, referencedColumnName = "gender")
 	public Gender getGenderCode() {
 		return genderCode;
@@ -80,14 +85,14 @@ public class StockKeepingUnit extends AbstractAdValoramEntity {
 	}
 	
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name="size_code", nullable = false, referencedColumnName = "size_code")
 	public Size getSizeCode() {
 		return sizeCode;
 	}
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-	@Fetch (FetchMode.SELECT)
+	@Fetch (FetchMode.JOIN)
 	@JoinColumn(name = "product_id")
 	public Product getProduct() {
 		return product;
