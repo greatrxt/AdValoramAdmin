@@ -165,7 +165,7 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	}
 
 	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
-	@Fetch (FetchMode.JOIN)
+	@Fetch (FetchMode.SELECT)
 	@JoinTable(name = "salesorder_entry_mapping", joinColumns = { @JoinColumn(name = "sales_order_id", nullable = false, updatable = false) }, 
 			inverseJoinColumns = { @JoinColumn(name = "entry_id", nullable = false, updatable = false) })
 	public Set<SalesOrderEntry> getEntry() {

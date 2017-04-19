@@ -19,22 +19,22 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
-import com.onequbit.advaloram.hibernate.dao.SalesOrderDao;
+import com.onequbit.advaloram.hibernate.dao.PackingListDao;
 import com.onequbit.advaloram.util.SystemUtils;
 
-@Path("salesOrder")
-public class SalesOrderService {
+@Path("packingList")
+public class PackingListService {
 
-	final static Logger logger = Logger.getLogger(SalesOrderService.class);
+	final static Logger logger = Logger.getLogger(PackingListService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getAllSalesOrders(@Context HttpServletRequest request, 
+	public static Response getAllPackingLists(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.getAllSalesOrders();
+			result = PackingListDao.getAllPackingLists();
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -47,14 +47,14 @@ public class SalesOrderService {
 	}
 	
 	@GET
-	@Path("/{salesOrderId}")
+	@Path("/{packingListId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getSalesOrderUsingId(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext, @PathParam("salesOrderId") Long salesOrderId){
+	public static Response getPackingListUsingId(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("packingListId") Long packingListId){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.getSalesOrderJson(salesOrderId);
+			result = PackingListDao.getPackingListLatestRevisionAsJson(packingListId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -67,14 +67,14 @@ public class SalesOrderService {
 	}
 	
 	@GET
-	@Path("/{salesOrderId}/linkedPackingLists")
+	@Path("/{packingListId}/linkedSalesOrder")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getLinkedPackingLists(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext, @PathParam("salesOrderId") Long salesOrderId){
+	public static Response getPackingListAndLinkedSalesOrderUsingPackingListId(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("packingListId") Long packingListId){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.getSalesOrderAndLinkedPackingLists(salesOrderId);
+			result = PackingListDao.getPackingListAndLinkedSalesOrderUsingPackingListId(packingListId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -87,14 +87,14 @@ public class SalesOrderService {
 	}
 	
 	@PUT
-	@Path("/{salesOrderId}/confirm")
+	@Path("/{packingListId}/confirm")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response confirmSalesOrder(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext, @PathParam("salesOrderId") Long salesOrderId){
+	public static Response confirmPackingList(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("packingListId") Long packingListId){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.confirmSalesOrder(salesOrderId);
+			result = PackingListDao.confirmPackingList(packingListId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -109,12 +109,12 @@ public class SalesOrderService {
 	@GET
 	@Path("/nextid")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getNextSalesOrderId(@Context HttpServletRequest request, 
+	public static Response getNextPackingListId(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.getNextSalesOrderId();
+			result = PackingListDao.getNextPackingListId();
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -129,16 +129,16 @@ public class SalesOrderService {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response createSalesOrder(@Context HttpServletRequest request, 
+	public static Response createPackingList(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to create salesOrder. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to create packing list. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.createOrUpdateSalesOrder((long) -1, inputStreamArray);
+			result = PackingListDao.createOrUpdatePackingList((long) -1, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -154,16 +154,16 @@ public class SalesOrderService {
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response updateSalesOrder(@Context HttpServletRequest request, 
+	public static Response updatePackingList(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext, @PathParam("id") Long id){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to update salesOrder. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to update packing list. Incoming JSON : " + inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.createOrUpdateSalesOrder(id, inputStreamArray);
+			result = PackingListDao.createOrUpdatePackingList(id, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

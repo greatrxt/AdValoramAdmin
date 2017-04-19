@@ -297,6 +297,7 @@ public class ProductDao {
 					while(sizeCodes.hasNext()){
 						Size sizeCode = sizeCodes.next();
 						StockKeepingUnit sku = new StockKeepingUnit(styleCode, colorCode, genderCode, sizeCode);
+						//StockKeepingUnit sku = new StockKeepingUnit(styleCode, colorCode.getColorCode(), genderCode.getGender(), sizeCode.getSizeCode());
 						sku.setProduct(product);
 						if(StockKeepingUnitDao.getStockKeepingUnit(sku) == null){
 							skus.add(sku);

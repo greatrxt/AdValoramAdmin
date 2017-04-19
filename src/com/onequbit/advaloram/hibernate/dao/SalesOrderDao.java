@@ -7,8 +7,10 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -86,7 +88,7 @@ public class SalesOrderDao {
 	 * @param salesOrder
 	 * @return
 	 */
-	public static SalesOrder getSalesOrder(SalesOrder salesOrder){
+	public static SalesOrder getSalesOrderLatestRevision(Long salesOrderId){
 
 		Session session = null;
 		try {
@@ -95,8 +97,10 @@ public class SalesOrderDao {
 			session.beginTransaction();
 			
 			Criteria criteria = session.createCriteria(SalesOrder.class);
-			criteria.add(Restrictions.eq("salesOrderId", salesOrder.getSalesOrderId()).ignoreCase());
-			criteria.setProjection(Projections.max("salesOrderRevisionNumber"));
+			criteria.add(Restrictions.eq("salesOrderId", salesOrderId));
+			//criteria.setProjection(Projections.max("salesOrderRevisionNumber"));
+			criteria.addOrder(Order.desc("salesOrderRevisionNumber"));
+			criteria.setMaxResults(1);
 			
 			List<SalesOrder> list = criteria.list();
 			if(list.size() > 0){
@@ -115,6 +119,55 @@ public class SalesOrderDao {
 	}
 	
 	/**
+	 * 
+	 * @param salesOrder
+	 * @return
+	 */
+	public static JSONObject getSalesOrderJson(long salesOrderId){
+
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(SalesOrder.class);
+			criteria.add(Restrictions.eq("salesOrderId", salesOrderId));
+			criteria.addOrder(Order.desc("salesOrderRevisionNumber"));//comment this line to send all sales order
+			criteria.setMaxResults(1);//comment this line to send all sales order
+			
+			List<SalesOrder> salesOrdersList = criteria.list();
+			
+			if(salesOrdersList.size() == 0){
+				//No SalesOrder found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No Sales Order found");
+			} else {
+				Iterator<SalesOrder> iterator = salesOrdersList.iterator();
+				while(iterator.hasNext()){
+					SalesOrder salesOrder = iterator.next();
+					JSONObject salesOrderJson = HibernateUtil.getJsonFromHibernateEntity(salesOrder);
+					resultArray.put(salesOrderJson);
+				}
+				
+				resultsJson.put(Application.RESULT, resultArray);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+
+	/**
 	 * Get all SalesOrders
 	 * @return
 	 */
@@ -122,18 +175,25 @@ public class SalesOrderDao {
 		JSONObject resultsJson = new JSONObject();
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
-		try {
-						
-			List<SalesOrder> salesOrdersList = (List<SalesOrder>)(Object)HibernateUtil.getAll(SalesOrder.class);
-
-			if(salesOrdersList.size() == 0){
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();		
+			
+			
+			Criteria criteria = 
+				    session.createCriteria(SalesOrder.class)
+				           .setProjection(Projections.distinct(Projections.property("salesOrderId")));
+			
+			List<Long> salesOrdersIdList = criteria.list();
+			
+			if(salesOrdersIdList.size() == 0){
 				//No SalesOrder found
 				resultsJson.put(Application.RESULT, Application.ERROR);
 				resultsJson.put(Application.ERROR_MESSAGE, "No SalesOrder found");
 			} else {
-				Iterator<SalesOrder> iterator = salesOrdersList.iterator();
+				Iterator<Long> iterator = salesOrdersIdList.iterator();
 				while(iterator.hasNext()){
-					SalesOrder salesOrder = iterator.next();
+					SalesOrder salesOrder = getSalesOrderLatestRevision(iterator.next());
 					JSONObject salesOrderJson = HibernateUtil.getJsonFromHibernateEntity(salesOrder);
 					resultArray.put(salesOrderJson);
 				}
@@ -186,16 +246,15 @@ public class SalesOrderDao {
 			int salesOrderRevisionNumber = 0;
 			
 			if(id > 0){
-				salesOrder = session.get(SalesOrder.class, id); 
-				
-				SalesOrder previousSalesOrderRevision = getSalesOrder(salesOrder);
+				salesOrder = getSalesOrderLatestRevision(id);
 							
-				if(previousSalesOrderRevision != null){
-					salesOrderRevisionNumber = previousSalesOrderRevision.getSalesOrderRevisionNumber() + 1;
+				if(salesOrder != null){
+					salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber() + 1;
 				}
 				
 			} else {
 				salesOrder = new SalesOrder();
+				salesOrder.setStatus(salesOrder.status.OPEN);
 				salesOrder.setSalesOrderId(getNextSalesOrderIdAsLong());
 			}			
 			
@@ -206,7 +265,7 @@ public class SalesOrderDao {
 			Set<SalesOrderEntry> entry = new HashSet<>();
 			for(int p = 0; p < productList.length(); p++){
 				JSONObject productJson = productList.getJSONObject(p);
-				int entryId =Integer.valueOf(productJson.getString(Tag.ENTRY_ID));
+				int entryId = Integer.valueOf(String.valueOf(productJson.get(Tag.ENTRY_ID)));
 				String styleCode = productJson.getString(Tag.STYLE_CODE);
 				String colorCode = productJson.getString(Tag.COLOR_CODE);
 				String genderCode = productJson.getString(Tag.GENDER_CODE);
@@ -219,8 +278,8 @@ public class SalesOrderDao {
 					if(!productJson.has(tag))
 						continue;
 					
-					if(!productJson.getString(tag).trim().isEmpty()){
-						int quantity = Integer.valueOf(productJson.getString(tag).trim());
+					if(!String.valueOf(productJson.get(tag)).trim().isEmpty()){
+						int quantity = Integer.valueOf(String.valueOf(productJson.get(tag)).trim());
 						if(quantity > 0){
 							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size));
 							SalesOrderEntry salesOrderEntry = new SalesOrderEntry();
@@ -236,16 +295,22 @@ public class SalesOrderDao {
 			salesOrder.setEntry(entry);
 			
 			salesOrder.setSalesOrderRevisionNumber(salesOrderRevisionNumber);
-			salesOrder.setLinkedCustomer(session.load(Customer.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.CUSTOMER_ID)))));
-			salesOrder.setReferredByEmployee(session.load(Employee.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.EMPLOYEE_ID)))));
-			salesOrder.setStatus(salesOrder.status.OPEN);
+			if(salesOrderJson.has(Tag.CUSTOMER_ID)){
+				if(!String.valueOf(salesOrderJson.get(Tag.CUSTOMER_ID)).trim().isEmpty())
+					salesOrder.setLinkedCustomer(session.load(Customer.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.CUSTOMER_ID)))));
+			}
+			if(salesOrderJson.has(Tag.EMPLOYEE_ID)){
+				if(!String.valueOf(salesOrderJson.get(Tag.EMPLOYEE_ID)).trim().isEmpty())
+					salesOrder.setReferredByEmployee(session.load(Employee.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.EMPLOYEE_ID)))));
+			}
 			
 			salesOrder.setRecordCreationTime(SystemUtils.getFormattedDate());	
 			salesOrder.setSalesOrderDate(SystemUtils.getFormattedDate());
 			session.save(salesOrder);					
 			session.getTransaction().commit();						
 			result.put(Application.RESULT, Application.SUCCESS);
-			
+			result.put("objectId", salesOrder.getId());
+			result.put("salesOrderId", salesOrder.getSalesOrderId());
 		} catch(Exception e){
 			e.printStackTrace();
 			result = SystemUtils.generateErrorMessage(e.getMessage());
@@ -256,5 +321,75 @@ public class SalesOrderDao {
 		}
 		
 		return result;
+	}
+
+	/**
+	 * Change status of Sales Order to CONFIRM
+	 * @param salesOrderId
+	 * @return
+	 */
+	public static JSONObject confirmSalesOrder(Long salesOrderId) {
+		
+		Session session = null;		
+		JSONObject resultsJson = new JSONObject();
+		try {
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(SalesOrder.class);
+			criteria.add(Restrictions.eq("salesOrderId", salesOrderId));
+			
+			List<SalesOrder> list = criteria.list();
+			if(list.size() > 0){
+				Iterator<SalesOrder> salesOrderIterator = list.iterator();
+				while(salesOrderIterator.hasNext()){
+					SalesOrder salesOrder = salesOrderIterator.next();
+					salesOrder.setStatus(salesOrder.status.CONFIRMED);
+					session.update(salesOrder);
+				}
+				session.getTransaction().commit();
+				resultsJson.put(Application.RESULT, Application.SUCCESS);
+			} else {
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No SalesOrder found");
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+
+	/**
+	 * Get sales order and linked packing lists
+	 * @param salesOrderId
+	 * @return
+	 */
+	public static JSONObject getSalesOrderAndLinkedPackingLists(Long salesOrderId) {
+		JSONObject result = new JSONObject();
+		JSONObject salesOrder = getSalesOrderJson(salesOrderId);	//max results set to 1. So only 1 sales order can be expected ( only the latest revision )
+		
+		if(!salesOrder.get(Application.RESULT).equals(Application.ERROR)){
+			JSONObject salesOrderLatestRevision = salesOrder.getJSONArray(Application.RESULT).getJSONObject(0);
+			JSONArray linkedPackingLists = new JSONArray();
+			
+			if(PackingListDao.getAllLatestRevisionOfPackingListsForSalesOrder(salesOrderId).get(Application.RESULT)
+					instanceof JSONArray){
+				linkedPackingLists = PackingListDao.getAllLatestRevisionOfPackingListsForSalesOrder(salesOrderId).getJSONArray(Application.RESULT);
+			}
+			
+			salesOrderLatestRevision.put("linkedPackingLists", linkedPackingLists);
+			result.put(Application.RESULT, salesOrderLatestRevision);
+			return result;
+		}
+		
+		return salesOrder; // return no sales order found message
 	}
 }

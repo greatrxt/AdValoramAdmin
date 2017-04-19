@@ -25,7 +25,7 @@ public class Customer extends AbstractAdValoramEntity {
 	 */
 	public static final long serialVersionUID = 4610067445012757575L;
 
-	//public long id;
+	public long id;
 	
 	public String companyName;
 	public String customerType;
@@ -75,6 +75,15 @@ public class Customer extends AbstractAdValoramEntity {
 	
 	public String specialInstructions, notes, filesMetaData;
 	
+	@Column(name="id")
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	@Column(name="company_name")
 	public String getCompanyName() {
 		return companyName;

@@ -19,6 +19,7 @@ import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.File;
 import com.onequbit.advaloram.hibernate.entity.Gender;
 import com.onequbit.advaloram.hibernate.entity.Location;
+import com.onequbit.advaloram.hibernate.entity.PackingList;
 import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.ProductCategory;
 import com.onequbit.advaloram.hibernate.entity.SalesOrder;
@@ -42,9 +43,10 @@ public class AbstractEntityDao {
 			FILE = "file",
 			GENDER = "gender", 
 			LOCATION = "location",
+			PACKING_LIST = "packingList",
 			PRODUCT = "product",
 			PRODUCT_CATEGORY = "productCategory",
-			SALES_ORDER = "salesOrder",
+			SALES_ORDER = "salesOrder",	//sales order not to be fetched using common API to avoid sales order being fetched by internal ID. Use field "salesOrderId" instead.
 			SEASON = "season",
 			SIZE = "size",
 			STYLE = "style",
@@ -77,6 +79,8 @@ public class AbstractEntityDao {
 				return Gender.class;
 			case LOCATION:
 				return Location.class;
+			case PACKING_LIST:
+				return PackingList.class;
 			case PRODUCT:
 				return Product.class;
 			case PRODUCT_CATEGORY:

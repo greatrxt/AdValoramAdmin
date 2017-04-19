@@ -32,6 +32,8 @@ import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.File;
 import com.onequbit.advaloram.hibernate.entity.Gender;
 import com.onequbit.advaloram.hibernate.entity.Location;
+import com.onequbit.advaloram.hibernate.entity.PackingList;
+import com.onequbit.advaloram.hibernate.entity.PackingListEntry;
 import com.onequbit.advaloram.hibernate.entity.Product;
 import com.onequbit.advaloram.hibernate.entity.ProductCategory;
 import com.onequbit.advaloram.hibernate.entity.SalesOrder;
@@ -55,10 +57,15 @@ public class HibernateUtil {
 	 * Fetch all objects of particular class
 	 * @param entity
 	 * @return
+	 * @throws Exception 
 	 */
-	public static List<Object> getAll(Class entity){
+	public static List<Object> getAll(Class entity) throws Exception{
 		Session session = null;
 		try {
+			if(entity.equals(SalesOrder.class)){
+				throw new Exception("Sales Order should not be fetched using common API. Please use API for SalesOrder which uses 'salesOrderId' (instead of internal ID)"
+						+ " to retrieve Sales Orders ");
+			}
 			
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
@@ -67,13 +74,6 @@ public class HibernateUtil {
 			 */Criteria criteria = session.createCriteria(entity);			
 			List<Object> list = criteria.list();
 			
-
-			/*// Create CriteriaBuilder
-			CriteriaBuilder builder = session.getCriteriaBuilder();
-
-			// Create CriteriaQuery
-			CriteriaQuery<Object> criteria = builder.createQuery(entity);
-			List<Object> list = session.createQuery(criteria).getResultList();*/
 			return list;
 			
 		} catch (Exception e){
@@ -91,14 +91,18 @@ public class HibernateUtil {
 	 * @param entityType
 	 * @param id
 	 * @return
+	 * @throws Exception 
 	 */
-	public static Object getUsingId(Class entityType, long id){
+	public static Object getUsingId(Class entityType, long id) throws Exception{
 		Session session = null;
 		try {
 			
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
-			
+			if(entityType.equals(SalesOrder.class)){
+				throw new Exception("Sales Order should not be fetched using common API. Please use API for SalesOrder which uses 'salesOrderId' (instead of internal ID)"
+						+ " to retrieve Sales Orders ");
+			}
 			return session.get(entityType, id);			
 			
 		} catch (Exception e){
@@ -132,7 +136,7 @@ public class HibernateUtil {
 				if(entity instanceof SalesOrder && (
 						field.getName().equals("salesOrderId")
 						|| field.getName().equals("linkedCustomer")
-						|| field.getName().equals("clientNameOnSalesOrderDate")
+						//|| field.getName().equals("clientNameOnSalesOrderDate")
 						|| field.getName().equals("referredByEmployee")
 						|| field.getName().equals("entry")
 						|| field.getName().equals("status")
@@ -141,6 +145,15 @@ public class HibernateUtil {
 					continue;
 				}
 				
+				if(entity instanceof PackingList && (field.getName().equals("packingListId")
+													|| field.getName().equals("linkedCustomer")
+													|| field.getName().equals("packingListRevisionNumber")
+													|| field.getName().equals("packingListDate")
+													|| field.getName().equals("linkedSalesOrder")
+													|| field.getName().equals("entry")
+													|| field.getName().equals("status"))){
+					continue;
+				}
 				if(entityJson.has(field.getName())){
 					System.out.println("Storing "+ "Field " + field.getName() + " of class " + field.getType().getCanonicalName());
 					Object entityObject = entityJson.get(field.getName());
@@ -225,6 +238,7 @@ public class HibernateUtil {
 	private static void loadEntityDataIntoJson(Object entity, Field[] fields, JSONObject entityJson){
 		for(int f = 0; f < fields.length; f++){
 			Field field = fields[f];
+			//System.out.println("loadEntityDataIntoJson : "+ entity.getClass().getSimpleName() + " " +field.getName() +" - f = " + f +"/"+fields.length+ "\n JSON = "+entityJson);
 			try {
 				if(field.getName().equals("serialVersionUID")){
 					continue;
@@ -254,11 +268,17 @@ public class HibernateUtil {
 					continue;
 				}
 				
-				if(entity instanceof SalesOrder && field.getType().isAssignableFrom(SalesOrder.Status.class)){
+				if(entity instanceof SalesOrder 
+						&& field.getType().isAssignableFrom(SalesOrder.Status.class)){
 					entityJson.put(field.getName(), field.get(entity));
 					continue;
 				}
 				
+				if(entity instanceof PackingList 
+						&& field.getType().isAssignableFrom(PackingList.Status.class)){
+					entityJson.put(field.getName(), field.get(entity));
+					continue;
+				}				
 				
 				if(field.getType().isAssignableFrom(String.class) || 
 						field.getType().isAssignableFrom(Long.class) ||
@@ -273,8 +293,10 @@ public class HibernateUtil {
 					JSONArray collectionArray = new JSONArray();
 					
 					Set<Object> subEntityCollection = (Set) field.get(entity);
+					int i = 0;
 					for(Object subEntity: subEntityCollection){
 						JSONObject subEntityJson = new JSONObject();
+						System.out.println("INSIDE FOR "  + (i++)+" "+subEntityCollection.size() + " F = "+f+"/"+fields.length);
 						loadEntityDataIntoJson(subEntity, subEntity.getClass().getDeclaredFields(), subEntityJson);
 						collectionArray.put(subEntityJson);
 					}
@@ -353,6 +375,8 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(Season.class);
         	configuration.addAnnotatedClass(SalesOrder.class);
         	configuration.addAnnotatedClass(SalesOrderEntry.class);
+        	configuration.addAnnotatedClass(PackingList.class);
+        	configuration.addAnnotatedClass(PackingListEntry.class);
         	configuration.addAnnotatedClass(Size.class);
         	configuration.addAnnotatedClass(StockKeepingUnit.class);
         	//configuration.addAnnotatedClass(Style.class);
