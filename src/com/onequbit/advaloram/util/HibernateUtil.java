@@ -31,6 +31,7 @@ import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.File;
 import com.onequbit.advaloram.hibernate.entity.Gender;
+import com.onequbit.advaloram.hibernate.entity.Invoice;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.PackingList;
 import com.onequbit.advaloram.hibernate.entity.PackingListEntry;
@@ -355,7 +356,6 @@ public class HibernateUtil {
             // Create the SessionFactory from hibernate.cfg.xml
         	Configuration configuration = new Configuration();
         	configuration.configure("hibernate.cfg.xml");   
-        	//configuration.setProperty("hibernate.default_schema", schemaName);
         	System.out.println("Hibernate Annotation Configuration loaded");      	
         	ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         	System.out.println("Hibernate Annotation serviceRegistry created");
@@ -369,6 +369,7 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(Employee.class);
         	configuration.addAnnotatedClass(File.class);
         	configuration.addAnnotatedClass(Gender.class);
+        	configuration.addAnnotatedClass(Invoice.class);
         	configuration.addAnnotatedClass(Location.class);
         	configuration.addAnnotatedClass(Product.class);
         	configuration.addAnnotatedClass(ProductCategory.class);
@@ -379,7 +380,6 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(PackingListEntry.class);
         	configuration.addAnnotatedClass(Size.class);
         	configuration.addAnnotatedClass(StockKeepingUnit.class);
-        	//configuration.addAnnotatedClass(Style.class);
         	configuration.addAnnotatedClass(Tax.class);
         	configuration.addAnnotatedClass(Transporter.class);
         	configuration.addAnnotatedClass(UnitOfMeasurement.class);        	

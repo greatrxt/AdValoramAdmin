@@ -93,7 +93,7 @@ public class PackingList extends AbstractAdValoramEntity {
 		return notes;
 	}
 
-	@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	@Fetch (FetchMode.SELECT)
 	@JoinTable(name = "packinglist_file", catalog = "public", joinColumns = { @JoinColumn(name = "packing_list_id", nullable = false, updatable = false) }, 
 			inverseJoinColumns = { @JoinColumn(name = "file_id", nullable = false, updatable = false) })
