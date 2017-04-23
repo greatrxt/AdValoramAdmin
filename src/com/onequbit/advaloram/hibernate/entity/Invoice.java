@@ -4,19 +4,38 @@ import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "invoice")
 public class Invoice extends AbstractAdValoramEntity {
 
 	/**
-	 * 
+	 * If sales order and packing list is simply linked to Invoice, then any changes in SO or PL would change Invoice. This is not desirable. Invoice data must be freezed once
+	 * issued. A way to achieve this would be to store SO and PL data again in Invoice. However this would result in unnecessarily storing same data.  
+	 * Instead of storing all Sales Order info again, associate Invoice with the revision number of the 
+	 * sales order and packing list. So that even if anything is changed in SO or PL, the changes will not be seen in an Invoice that has already been created since Invoice is linked to
+	 * a particular revision of SO and PL  
 	 */
 	private static final long serialVersionUID = 6162514716706356606L;
 	
+	/*
+	Instead of linking using id and revision number, directly link with the etity 
 	public long linkedPackingListId;
 	
+	public int linkedPackingListRevisionNumber;	
+	
 	public long linkedSalesOrderId;
+	
+	public int linkedSalesOrderRevisionNumber;*/
+	
+	public SalesOrder linkedSalesOrder;
+	
+	public PackingList linkedPackingList;
 	
 	public long invoiceId;
 	
@@ -42,12 +61,12 @@ public class Invoice extends AbstractAdValoramEntity {
 		OPEN, ISSUED, REVISED, CANCELLED 
 	}
 	
-	
 	@Column(name="invoice_id")
 	public long getInvoiceId() {
 		return invoiceId;
 	}
 
+	/*
 	@Column(name="packing_list_id")
 	public long getLinkedPackingListId() {
 		return linkedPackingListId;
@@ -57,15 +76,44 @@ public class Invoice extends AbstractAdValoramEntity {
 	public long getLinkedSalesOrderId() {
 		return linkedSalesOrderId;
 	}
+	
+	
+	@Column(name="linked_packing_list_revision_number")
+	public int getLinkedPackingListRevisionNumber() {
+		return linkedPackingListRevisionNumber;
+	}
+
+	@Column(name="linked_sales_order_revision_number")
+	public int getLinkedSalesOrderRevisionNumber() {
+		return linkedSalesOrderRevisionNumber;
+	}
+	
+	public void setLinkedPackingListRevisionNumber(int linkedPackingListRevisionNumber) {
+		this.linkedPackingListRevisionNumber = linkedPackingListRevisionNumber;
+	}
+
+	public void setLinkedSalesOrderRevisionNumber(int linkedSalesOrderRevisionNumber) {
+		this.linkedSalesOrderRevisionNumber = linkedSalesOrderRevisionNumber;
+	}
+	
+	public void setLinkedPackingListId(long linkedPackingListId) {
+		this.linkedPackingListId = linkedPackingListId;
+	}
+
+	public void setLinkedSalesOrderId(long linkedSalesOrderId) {
+		this.linkedSalesOrderId = linkedSalesOrderId;
+	}
+	
+	*/
 
 	@ManyToOne(cascade = CascadeType.DETACH)
-	@JoinColumn(name="sales_employee", nullable = false, referencedColumnName = "id")
+	@JoinColumn(name="sales_employee", nullable = true, referencedColumnName = "id")
 	public Employee getSalesEmployee() {
 		return salesEmployee;
 	}
 
 	@ManyToOne(cascade = CascadeType.DETACH)
-	@JoinColumn(name="referee_partner_name", nullable = false, referencedColumnName = "company_name")
+	@JoinColumn(name="referee_partner_name", nullable = true, referencedColumnName = "company_name")
 	public Customer getRefereePartnerName() {
 		return refereePartnerName;
 	}
@@ -105,7 +153,26 @@ public class Invoice extends AbstractAdValoramEntity {
 		return invoiceDate;
 	}
 
-	
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name="linked_sales_order", nullable = true, referencedColumnName = "id")
+	public SalesOrder getLinkedSalesOrder() {
+		return linkedSalesOrder;
+	}
+
+	@OneToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name="linked_packing_list", nullable = true, referencedColumnName = "id")
+	public PackingList getLinkedPackingList() {
+		return linkedPackingList;
+	}
+
+	public void setLinkedSalesOrder(SalesOrder linkedSalesOrder) {
+		this.linkedSalesOrder = linkedSalesOrder;
+	}
+
+	public void setLinkedPackingList(PackingList linkedPackingList) {
+		this.linkedPackingList = linkedPackingList;
+	}
+
 	public void setInvoiceId(long invoiceId) {
 		this.invoiceId = invoiceId;
 	}
@@ -122,13 +189,6 @@ public class Invoice extends AbstractAdValoramEntity {
 		this.status = status;
 	}
 
-	public void setLinkedPackingListId(long linkedPackingListId) {
-		this.linkedPackingListId = linkedPackingListId;
-	}
-
-	public void setLinkedSalesOrderId(long linkedSalesOrderId) {
-		this.linkedSalesOrderId = linkedSalesOrderId;
-	}
 
 	public void setSalesEmployee(Employee salesEmployee) {
 		this.salesEmployee = salesEmployee;

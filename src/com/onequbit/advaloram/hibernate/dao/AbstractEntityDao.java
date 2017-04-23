@@ -18,6 +18,7 @@ import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.File;
 import com.onequbit.advaloram.hibernate.entity.Gender;
+import com.onequbit.advaloram.hibernate.entity.Invoice;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.PackingList;
 import com.onequbit.advaloram.hibernate.entity.Product;
@@ -42,6 +43,7 @@ public class AbstractEntityDao {
 			EMPLOYEE = "employee",
 			FILE = "file",
 			GENDER = "gender", 
+			INVOICE = "invoice", 
 			LOCATION = "location",
 			PACKING_LIST = "packingList",
 			PRODUCT = "product",
@@ -77,6 +79,8 @@ public class AbstractEntityDao {
 				return File.class;
 			case GENDER:
 				return Gender.class;
+			case INVOICE:
+				return Invoice.class;
 			case LOCATION:
 				return Location.class;
 			case PACKING_LIST:
@@ -103,7 +107,7 @@ public class AbstractEntityDao {
 				return UnitOfMeasurement.class;
 		}
 		
-		throw new Exception("Class" + entityClassName + "not found");
+		throw new Exception("Class " + entityClassName + " not found");
 	}
 	/**
 	 * 
@@ -116,7 +120,10 @@ public class AbstractEntityDao {
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
 		try {
-			Object entity = HibernateUtil.getUsingId(getClassByName(entityClassName), id);		
+			Object entity = HibernateUtil.getUsingId(getClassByName(entityClassName), id);
+			if(entity == null){
+				throw new Exception("Entity of class '"+ entityClassName + "' with ID '" + id + "' not found");
+			}
 			JSONObject entityJson = HibernateUtil.getJsonFromHibernateEntity(entity);
 			resultArray.put(entityJson);				
 			resultsJson.put(Application.RESULT, resultArray);

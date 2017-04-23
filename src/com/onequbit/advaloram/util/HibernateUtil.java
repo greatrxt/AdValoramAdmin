@@ -155,6 +155,19 @@ public class HibernateUtil {
 													|| field.getName().equals("status"))){
 					continue;
 				}
+				
+				
+				if(entity instanceof Invoice && (field.getName().equals("linkedSalesOrder")
+													|| field.getName().equals("linkedPackingList")
+													|| field.getName().equals("invoiceId")
+													|| field.getName().equals("salesEmployee")
+													|| field.getName().equals("refereePartnerName")
+													|| field.getName().equals("invoiceRevisionNumber")
+													|| field.getName().equals("status")
+													|| field.getName().equals("invoiceDate"))){
+					continue;
+				}
+				
 				if(entityJson.has(field.getName())){
 					System.out.println("Storing "+ "Field " + field.getName() + " of class " + field.getType().getCanonicalName());
 					Object entityObject = entityJson.get(field.getName());
@@ -219,7 +232,7 @@ public class HibernateUtil {
 	 * @param entity
 	 * @return
 	 */
-	public static JSONObject getJsonFromHibernateEntity(Object entity){
+	public static JSONObject getJsonFromHibernateEntity(Object entity) {
 		JSONObject entityJson = new JSONObject();
 		Field[] fields = entity.getClass().getDeclaredFields();
 		loadEntityDataIntoJson(entity, fields, entityJson);
@@ -269,18 +282,13 @@ public class HibernateUtil {
 					continue;
 				}
 				
-				if(entity instanceof SalesOrder 
-						&& field.getType().isAssignableFrom(SalesOrder.Status.class)){
+				if(field.getType().isAssignableFrom(SalesOrder.Status.class)
+						||  field.getType().isAssignableFrom(PackingList.Status.class)
+						|| field.getType().isAssignableFrom(Invoice.Status.class)){
 					entityJson.put(field.getName(), field.get(entity));
 					continue;
 				}
-				
-				if(entity instanceof PackingList 
-						&& field.getType().isAssignableFrom(PackingList.Status.class)){
-					entityJson.put(field.getName(), field.get(entity));
-					continue;
-				}				
-				
+									
 				if(field.getType().isAssignableFrom(String.class) || 
 						field.getType().isAssignableFrom(Long.class) ||
 						field.getType().isAssignableFrom(Date.class) ||

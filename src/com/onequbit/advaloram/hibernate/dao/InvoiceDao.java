@@ -19,6 +19,8 @@ import com.onequbit.advaloram.hibernate.dao.ProductDao.Tag;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.Location;
+import com.onequbit.advaloram.hibernate.entity.PackingList;
+import com.onequbit.advaloram.hibernate.entity.SalesOrder;
 import com.onequbit.advaloram.hibernate.entity.Invoice;
 import com.onequbit.advaloram.hibernate.entity.Invoice.Status;
 import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
@@ -143,7 +145,7 @@ public class InvoiceDao {
 			if(invoicesList.size() == 0){
 				//No Invoice found
 				resultsJson.put(Application.RESULT, Application.ERROR);
-				resultsJson.put(Application.ERROR_MESSAGE, "No Sales Order found");
+				resultsJson.put(Application.ERROR_MESSAGE, "No Invoice with invoiceID '" + invoiceId + "' found");
 			} else {
 				Iterator<Invoice> iterator = invoicesList.iterator();
 				while(iterator.hasNext()){
@@ -213,7 +215,8 @@ public class InvoiceDao {
 	}
 	
 	public static class Tag {
-		public static final String REFEREE_PARTNER_ID = "refereePartnerId", SALES_EMPLOYEE_ID = "salesEmployeeId";
+		public static final String REFEREE_PARTNER_ID = "refereePartnerId", SALES_EMPLOYEE_ID = "salesEmployeeId",
+				LINKED_SALES_ORDER_INTERNAL_ID = "linkedSalesOrderInternalId", LINKED_PACKING_LIST_INTERNAL_ID = "linkedPackingListInternalId";
 	}
 	
 	/**
@@ -257,6 +260,9 @@ public class InvoiceDao {
 					invoice.setSalesEmployee(session.load(Employee.class, Long.parseLong(String.valueOf(invoiceJson.get(Tag.SALES_EMPLOYEE_ID)))));
 			}
 			
+			invoice.setLinkedSalesOrder(session.get(SalesOrder.class, Long.valueOf(String.valueOf(invoiceJson.get(Tag.LINKED_SALES_ORDER_INTERNAL_ID)))));
+			invoice.setLinkedPackingList(session.get(PackingList.class, Long.valueOf(String.valueOf(invoiceJson.get(Tag.LINKED_PACKING_LIST_INTERNAL_ID)))));
+			
 			invoice.setRecordCreationTime(SystemUtils.getFormattedDate());	
 			invoice.setInvoiceDate(SystemUtils.getFormattedDate());
 			session.save(invoice);					
@@ -281,7 +287,7 @@ public class InvoiceDao {
 	 * @param invoiceId
 	 * @return
 	 */
-	public static JSONObject confirmInvoice(Long invoiceId) {
+	public static JSONObject issueInvoice(Long invoiceId) {
 		
 		Session session = null;		
 		JSONObject resultsJson = new JSONObject();

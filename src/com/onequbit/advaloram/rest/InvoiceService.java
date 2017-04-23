@@ -67,14 +67,14 @@ public class InvoiceService {
 	}
 	
 	@PUT
-	@Path("/{invoiceId}/confirm")
+	@Path("/{invoiceId}/issue")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response confirmInvoice(@Context HttpServletRequest request, 
+	public static Response issueInvoice(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext, @PathParam("invoiceId") Long invoiceId){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = InvoiceDao.confirmInvoice(invoiceId);
+			result = InvoiceDao.issueInvoice(invoiceId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

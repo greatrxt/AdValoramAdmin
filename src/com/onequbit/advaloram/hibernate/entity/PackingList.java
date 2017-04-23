@@ -30,6 +30,10 @@ public class PackingList extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
+	
+
+	public long id;
+	
 	private static final long serialVersionUID = 7133812177437764261L;
 
 	public long packingListId; //will be useful in case of multiple revisions
@@ -53,11 +57,18 @@ public class PackingList extends AbstractAdValoramEntity {
 	public Set<File> associatedFiles;
 	
 	public Status status;
+
+	public String revisionReason;
 	
 	public enum Status {
 		OPEN, CONFIRMED, DISPATCHED, CANCELLED 
 	}
 		
+	@Column(name="id")
+	public Long getId() {
+		return id;
+	}
+
 	@Column(name="packing_list_id")
 	public long getPackingListId() {
 		return packingListId;
@@ -120,6 +131,20 @@ public class PackingList extends AbstractAdValoramEntity {
 	@Column(name="linked_sales_order_id")	//not linked using SalesOrder since a single sales order can have multiple entries in the form of revisions
 	public Long getLinkedSalesOrderId() {
 		return linkedSalesOrderId;
+	}
+	
+	@Column(name="revision_reason")
+	public String getRevisionReason() {
+		return revisionReason;
+	}
+
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setRevisionReason(String revisionReason) {
+		this.revisionReason = revisionReason;
 	}
 
 	public void setLinkedSalesOrderId(Long linkedSalesOrderId) {

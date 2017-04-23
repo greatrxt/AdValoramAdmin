@@ -28,6 +28,8 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	/**
 	 * 
 	 */
+	public long id;
+	
 	private static final long serialVersionUID = 8688511054388668328L;
 	
 	public long salesOrderId; //will be useful in case of multiple revisions
@@ -74,12 +76,19 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	
 	public String notes;
 	
+	public String revisionReason;
+	
 	public Set<File> associatedFiles;
 	
 	public Status status;
 	
 	public enum Status {
 		OPEN, CONFIRMED, DISPATCHED, CANCELLED 
+	}
+	
+	@Column(name="id")
+	public Long getId() {
+		return id;
 	}
 	
 	@Column(name="sales_order_id")
@@ -208,6 +217,19 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	@Enumerated(EnumType.STRING)
 	public Status getStatus() {
 		return status;
+	}
+	
+	@Column(name="revision_reason")
+	public String getRevisionReason() {
+		return revisionReason;
+	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public void setRevisionReason(String revisionReason) {
+		this.revisionReason = revisionReason;
 	}
 
 	public void setStatus(Status status) {
