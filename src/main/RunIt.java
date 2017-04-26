@@ -40,7 +40,7 @@ public class RunIt {
         //stock.setColor(colors);
         stock.setRecordCreationTime(SystemUtils.getFormattedDate());
         stock.setLastUpdate(SystemUtils.getFormattedDate());
-        stock.setVersion(0);
+        //stock.setVersion(0);
         
         session.save(stock);
 

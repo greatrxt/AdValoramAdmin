@@ -19,22 +19,22 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
-import com.onequbit.advaloram.hibernate.dao.InvoiceDao;
+import com.onequbit.advaloram.hibernate.dao.CreditNoteDao;
 import com.onequbit.advaloram.util.SystemUtils;
 
-@Path("invoice")
-public class InvoiceService {
+@Path("creditNote")
+public class CreditNoteService {
 
-	final static Logger logger = Logger.getLogger(InvoiceService.class);
+	final static Logger logger = Logger.getLogger(CreditNoteService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getAllInvoices(@Context HttpServletRequest request, 
+	public static Response getAllCreditNotes(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = InvoiceDao.getAllInvoices();
+			result = CreditNoteDao.getAllCreditNotes();
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -47,34 +47,14 @@ public class InvoiceService {
 	}
 	
 	@GET
-	@Path("/{invoiceId}")
+	@Path("/{creditNoteId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getInvoiceUsingId(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext, @PathParam("invoiceId") Long invoiceId){
+	public static Response getCreditNoteUsingId(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("creditNoteId") Long creditNoteId){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = InvoiceDao.getInvoiceJson(invoiceId);
-		} catch (Exception e) {
-			result = new JSONObject();
-			result.put(Application.RESULT, Application.ERROR);
-			result.put(Application.ERROR_MESSAGE, e.getMessage());
-			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
-		}
-		
-		return Response.status(Response.Status.OK).entity(result.toString()).build();
-	}
-	
-	@GET
-	@Path("/internalId/{internalId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getInvoiceUsingInternalId(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext, @PathParam("internalId") Long internalId){
-		JSONObject result;
-		try {
-			result = new JSONObject();
-			result = InvoiceDao.getInvoiceJsonUsingInternalId(internalId);
+			result = CreditNoteDao.getCreditNoteJson(creditNoteId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -87,14 +67,14 @@ public class InvoiceService {
 	}
 	
 	@PUT
-	@Path("/{invoiceId}/issue")
+	@Path("/{creditNoteId}/issue")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response issueInvoice(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext, @PathParam("invoiceId") Long invoiceId){
+	public static Response confirmCreditNote(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("creditNoteId") Long creditNoteId){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = InvoiceDao.issueInvoice(invoiceId);
+			result = CreditNoteDao.issueCreditNote(creditNoteId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -105,61 +85,21 @@ public class InvoiceService {
 		
 		return Response.status(Response.Status.OK).entity(result.toString()).build();
 	}
-	
-	
-	@GET
-	@Path("/idlist")
-	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getAllInvoiceIds(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext){
-		JSONObject result;
-		try {
-			result = new JSONObject();
-			result = InvoiceDao.getAllInvoicesId();
-		} catch (Exception e) {
-			result = new JSONObject();
-			result.put(Application.RESULT, Application.ERROR);
-			result.put(Application.ERROR_MESSAGE, e.getMessage());
-			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
-		}
-		
-		return Response.status(Response.Status.OK).entity(result.toString()).build();
-	}
-	
-	@GET
-	@Path("/nextid")
-	@Produces(MediaType.APPLICATION_JSON)
-	public static Response getNextInvoiceId(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext){
-		JSONObject result;
-		try {
-			result = new JSONObject();
-			result = InvoiceDao.getNextInvoiceId();
-		} catch (Exception e) {
-			result = new JSONObject();
-			result.put(Application.RESULT, Application.ERROR);
-			result.put(Application.ERROR_MESSAGE, e.getMessage());
-			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
-		}
-		
-		return Response.status(Response.Status.OK).entity(result.toString()).build();
-	}
+
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response createInvoice(@Context HttpServletRequest request, 
+	public static Response createCreditNote(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to create invoice. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to create creditNote. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = InvoiceDao.createOrUpdateInvoice((long) -1, inputStreamArray);
+			result = CreditNoteDao.createOrUpdateCreditNote((long) -1, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -175,16 +115,16 @@ public class InvoiceService {
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response updateInvoice(@Context HttpServletRequest request, 
+	public static Response updateCreditNote(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext, @PathParam("id") Long id){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
-		logger.info("\n\n\n\nReceived Request to update invoice. Incoming JSON : " +inputStreamArray);		
+		logger.info("\n\n\n\nReceived Request to update creditNote. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = InvoiceDao.createOrUpdateInvoice(id, inputStreamArray);
+			result = CreditNoteDao.createOrUpdateCreditNote(id, inputStreamArray);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

@@ -48,7 +48,7 @@ public class LocationDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			result = SystemUtils.generateErrorMessage(e.getMessage());
+			result = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -86,7 +86,7 @@ public class LocationDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -134,7 +134,7 @@ public class LocationDao {
 			}		
 		} catch(Exception e){
 			e.printStackTrace();
-			result = SystemUtils.generateErrorMessage(e.getMessage());
+			result = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();

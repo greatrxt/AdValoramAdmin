@@ -26,7 +26,7 @@ public abstract class AbstractAdValoramEntity implements Serializable{
 
 
 	public Long id = null;
-    public Integer version = 0;
+    //public Integer version = 0;
     public Date lastUpdate;
 
     public Date recordCreationTime;
@@ -56,7 +56,7 @@ public abstract class AbstractAdValoramEntity implements Serializable{
 	}
 
 	 
-    @Version
+    /*@Version
     @Column(name = "version")
 	public Integer getVersion() {
 		return version;
@@ -64,7 +64,7 @@ public abstract class AbstractAdValoramEntity implements Serializable{
 
 	public void setVersion(Integer version) {
 		this.version = version;
-	}
+	}*/
     
 	@Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_update")

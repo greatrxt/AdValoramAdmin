@@ -39,7 +39,7 @@ public class PackingListDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} 
 		
 		return resultsJson;
@@ -152,7 +152,7 @@ public class PackingListDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -189,7 +189,11 @@ public class PackingListDao {
 				resultsJson.put(Application.ERROR_MESSAGE, "No Packing List found");
 			} else {
 				PackingList packingList = packingListsList.get(0);
-				Long linkedSalesOrderId = packingList.getLinkedSalesOrderId();
+				//Long linkedSalesOrderId = packingList.getLinkedSalesOrderId();
+				Long linkedSalesOrderId = (long) -1;
+				if(packingList.getLinkedSalesOrder()!=null){
+					linkedSalesOrderId = packingList.getLinkedSalesOrder().getSalesOrderId();
+				}
 				if(linkedSalesOrderId > 0){
 					return SalesOrderDao.getSalesOrderAndLinkedPackingLists(linkedSalesOrderId);
 				} else {
@@ -203,7 +207,7 @@ public class PackingListDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -247,7 +251,7 @@ public class PackingListDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -294,7 +298,7 @@ public class PackingListDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -304,7 +308,8 @@ public class PackingListDao {
 		return resultsJson;
 	}
 	public static class Tag {
-		public static final String CUSTOMER_ID = "linkedCustomer", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", LINKED_SALES_ORDER_ID = "linkedSalesOrderId",
+		public static final String CUSTOMER_ID = "linkedCustomer", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", LINKED_SALES_ORDER_INTERNAL_ID = "linkedSalesOrderInternalId",
+				LINKED_SALES_ORDER_ID = "linkedSalesOrderId",
 				GENDER_CODE = "genderCode", COLOR_CODE = "colorCode",
 				QTY_SIZE_28 = "quantityForSize28",
 						QTY_SIZE_30 = "quantityForSize30",
@@ -394,6 +399,15 @@ public class PackingListDao {
 				}
 			}
 			
+			if(packingListJson.has(Tag.LINKED_SALES_ORDER_INTERNAL_ID)){
+				if(!String.valueOf(packingListJson.get(Tag.LINKED_SALES_ORDER_INTERNAL_ID)).trim().isEmpty()){
+					Long linkedSalesOrderId = Long.valueOf(String.valueOf(packingListJson.get(Tag.LINKED_SALES_ORDER_INTERNAL_ID)));
+					if(linkedSalesOrderId > 0){
+						packingList.setLinkedSalesOrder(session.get(SalesOrder.class, linkedSalesOrderId));
+					}
+				}
+			}
+			
 			if(packingListJson.has(Tag.CUSTOMER_ID)){
 				if(!String.valueOf(packingListJson.get(Tag.CUSTOMER_ID)).trim().isEmpty()){
 					Long linkedCustomerId = Long.valueOf(String.valueOf(packingListJson.get(Tag.CUSTOMER_ID)));
@@ -408,14 +422,18 @@ public class PackingListDao {
 			
 			packingList.setRecordCreationTime(SystemUtils.getFormattedDate());	
 			packingList.setPackingListDate(SystemUtils.getFormattedDate());
-			session.save(packingList);					
+			if(id > 0 && packingList.getStatus().equals(PackingList.Status.OPEN)){
+				session.update(packingList);
+			} else {
+				session.save(packingList);					
+			}
 			session.getTransaction().commit();						
 			result.put(Application.RESULT, Application.SUCCESS);
 			result.put("objectId", packingList.getId());
 			result.put("packingListId", packingList.getPackingListId());
 		} catch(Exception e){
 			e.printStackTrace();
-			result = SystemUtils.generateErrorMessage(e.getMessage());
+			result = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -459,7 +477,7 @@ public class PackingListDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();

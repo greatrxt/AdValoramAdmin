@@ -1,29 +1,22 @@
 package com.onequbit.advaloram.hibernate.dao;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
-import com.onequbit.advaloram.hibernate.dao.ProductDao.Tag;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
-import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.PackingList;
 import com.onequbit.advaloram.hibernate.entity.SalesOrder;
 import com.onequbit.advaloram.hibernate.entity.Invoice;
 import com.onequbit.advaloram.hibernate.entity.Invoice.Status;
-import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
 
@@ -44,7 +37,7 @@ public class InvoiceDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} 
 		
 		return resultsJson;
@@ -159,7 +152,7 @@ public class InvoiceDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -168,6 +161,50 @@ public class InvoiceDao {
 		
 		return resultsJson;
 	}
+	
+	/**
+	 * Get all Invoices ID
+	 * @return
+	 */
+	public static JSONObject getAllInvoicesId(){
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();		
+			
+			
+			Criteria criteria = 
+				    session.createCriteria(Invoice.class)
+				           .setProjection(Projections.distinct(Projections.property("invoiceId")));
+			
+			List<Long> invoicesIdList = criteria.list();
+			
+			if(invoicesIdList.size() == 0){
+				//No Invoice found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No Invoice found");
+			} else {
+				Iterator<Long> iterator = invoicesIdList.iterator();
+				while(iterator.hasNext()){
+					resultArray.put(iterator.next());
+				}
+				resultsJson.put(Application.RESULT, resultArray);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+	
 
 	/**
 	 * Get all Invoices
@@ -204,7 +241,7 @@ public class InvoiceDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -263,16 +300,20 @@ public class InvoiceDao {
 			invoice.setLinkedSalesOrder(session.get(SalesOrder.class, Long.valueOf(String.valueOf(invoiceJson.get(Tag.LINKED_SALES_ORDER_INTERNAL_ID)))));
 			invoice.setLinkedPackingList(session.get(PackingList.class, Long.valueOf(String.valueOf(invoiceJson.get(Tag.LINKED_PACKING_LIST_INTERNAL_ID)))));
 			
-			invoice.setRecordCreationTime(SystemUtils.getFormattedDate());	
-			invoice.setInvoiceDate(SystemUtils.getFormattedDate());
-			session.save(invoice);					
+			if(id > 0 && invoice.getStatus().equals(Invoice.Status.OPEN)){
+				session.update(invoice);
+			} else {
+				invoice.setRecordCreationTime(SystemUtils.getFormattedDate());	
+				invoice.setInvoiceDate(SystemUtils.getFormattedDate());
+				session.save(invoice);	//create new revision only if invoice is not open
+			}					
 			session.getTransaction().commit();						
 			result.put(Application.RESULT, Application.SUCCESS);
 			result.put("objectId", invoice.getId());
 			result.put("invoiceId", invoice.getInvoiceId());
 		} catch(Exception e){
 			e.printStackTrace();
-			result = SystemUtils.generateErrorMessage(e.getMessage());
+			result = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -316,7 +357,38 @@ public class InvoiceDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+
+	/**
+	 * Uses internal ID i.e ID column to fetch Invoice
+	 * @param internalId
+	 * @return
+	 */
+	public static JSONObject getInvoiceJsonUsingInternalId(Long internalId) {
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Invoice invoice = session.get(Invoice.class, internalId);
+			JSONObject invoiceJson = HibernateUtil.getJsonFromHibernateEntity(invoice);
+			resultArray.put(invoiceJson);
+			resultsJson.put(Application.RESULT, resultArray);
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();

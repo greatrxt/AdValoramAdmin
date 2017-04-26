@@ -32,7 +32,7 @@ public class FileDao {
 			file.setFormat(format);
 			file.setRecordCreationTime(SystemUtils.getFormattedDate());
 			file.setName(fileName);
-			file.setVersion(HibernateUtil.DB_VERSION);
+			//file.setVersion(HibernateUtil.DB_VERSION);
 			session.save(file);
 			session.getTransaction().commit();
 			

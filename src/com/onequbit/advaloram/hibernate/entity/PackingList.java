@@ -48,7 +48,9 @@ public class PackingList extends AbstractAdValoramEntity {
 	
 	public String purchaseOrderReference;
 	
-	public Long linkedSalesOrderId;	//not linked using SalesOrder since a single sales order can have multiple entries in the form of revisions
+	public Long linkedSalesOrderId;	//using SalesOrderID since a single sales order can have multiple entries in the form of revisions
+	
+	public SalesOrder linkedSalesOrder;	//linked directly to salesorder instead of internal ID to avoid confusion in case new revision is made
 	
 	public Set<PackingListEntry> entry;
 	
@@ -133,6 +135,12 @@ public class PackingList extends AbstractAdValoramEntity {
 		return linkedSalesOrderId;
 	}
 	
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name="linked_sales_order", nullable = true, referencedColumnName = "id")
+	public SalesOrder getLinkedSalesOrder() {
+		return linkedSalesOrder;
+	}
+	
 	@Column(name="revision_reason")
 	public String getRevisionReason() {
 		return revisionReason;
@@ -146,9 +154,15 @@ public class PackingList extends AbstractAdValoramEntity {
 	public void setRevisionReason(String revisionReason) {
 		this.revisionReason = revisionReason;
 	}
+	
+	
 
 	public void setLinkedSalesOrderId(Long linkedSalesOrderId) {
 		this.linkedSalesOrderId = linkedSalesOrderId;
+	}
+
+	public void setLinkedSalesOrder(SalesOrder linkedSalesOrder) {
+		this.linkedSalesOrder = linkedSalesOrder;
 	}
 
 	public void setLinkedCustomer(Customer linkedCustomer) {

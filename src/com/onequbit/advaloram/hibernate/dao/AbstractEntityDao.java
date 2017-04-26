@@ -14,6 +14,7 @@ import com.onequbit.advaloram.hibernate.entity.AbstractAdValoramEntity;
 import com.onequbit.advaloram.hibernate.entity.Bank;
 import com.onequbit.advaloram.hibernate.entity.Brand;
 import com.onequbit.advaloram.hibernate.entity.Color;
+import com.onequbit.advaloram.hibernate.entity.CreditNote;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.File;
@@ -38,6 +39,7 @@ public class AbstractEntityDao {
 	
 	public final static String BANK = "bank", 
 			BRAND = "brand", 
+			CREDIT_NOTE = "creditNote",
 			COLOR = "color", 
 			CUSTOMER = "customer", 
 			EMPLOYEE = "employee",
@@ -69,6 +71,8 @@ public class AbstractEntityDao {
 				return Bank.class;
 			case BRAND:
 				return Brand.class;
+			case CREDIT_NOTE:
+				return CreditNote.class;
 			case COLOR:
 				return Color.class;
 			case CUSTOMER:
@@ -109,6 +113,7 @@ public class AbstractEntityDao {
 		
 		throw new Exception("Class " + entityClassName + " not found");
 	}
+	
 	/**
 	 * 
 	 * @param entityClass
@@ -130,7 +135,7 @@ public class AbstractEntityDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -163,7 +168,7 @@ public class AbstractEntityDao {
 				
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
@@ -314,7 +319,7 @@ public class AbstractEntityDao {
 					entity = new UnitOfMeasurement();
 					break;
 				default:
-					throw new Exception("Class" + entityClass + "not found");
+					throw new Exception("Class " + entityClass + " not found");
 			}
 			
 			HibernateUtil.setDataFromJson(entity, entityJson);
@@ -331,7 +336,7 @@ public class AbstractEntityDao {
 			}		
 		} catch(Exception e){
 			e.printStackTrace();
-			result = SystemUtils.generateErrorMessage(e.getMessage());
+			result = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();

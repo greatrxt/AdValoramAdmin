@@ -31,10 +31,12 @@ public class SystemUtils {
 	 * @param errorMessage
 	 * @return
 	 */
-	public static JSONObject generateErrorMessage(String errorMessage){
+	public static JSONObject generateErrorMessage(Exception e){
 		JSONObject error = new JSONObject();
 		error.put(Application.RESULT, Application.ERROR);
-		error.put(Application.ERROR_MESSAGE, errorMessage);
+		error.put(Application.ERROR_MESSAGE, e.getMessage());
+		error.put("ClassName", e.getStackTrace()[0].getClassName());
+		error.put("LineNumber", e.getStackTrace()[0].getLineNumber());
 		return error;
 	}
 	

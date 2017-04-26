@@ -9,9 +9,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "invoice")
+@Table(
+		name = "invoice", 
+		uniqueConstraints = {@UniqueConstraint(columnNames = {"linked_sales_order", "linked_packing_list"})}	//implies that combination of salesOrder and packing list mut be unique. 
+		)
 public class Invoice extends AbstractAdValoramEntity {
 
 	/**

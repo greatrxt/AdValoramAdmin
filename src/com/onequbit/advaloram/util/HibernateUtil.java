@@ -27,6 +27,8 @@ import com.onequbit.advaloram.hibernate.entity.Bank;
 import com.onequbit.advaloram.hibernate.entity.Brand;
 import com.onequbit.advaloram.hibernate.entity.Color;
 import com.onequbit.advaloram.hibernate.entity.ColorCode;
+import com.onequbit.advaloram.hibernate.entity.CreditNote;
+import com.onequbit.advaloram.hibernate.entity.CreditNoteEntry;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.File;
@@ -50,7 +52,7 @@ import com.onequbit.advaloram.hibernate.entity.AdValUser;
 
 public class HibernateUtil {
 	
-	public static final Integer DB_VERSION = 0;
+	public static final Integer DB_VERSION = 1;
 	//Annotation based configuration
 	private static SessionFactory sessionAnnotationFactory;
 	
@@ -168,6 +170,15 @@ public class HibernateUtil {
 					continue;
 				}
 				
+				if(entity instanceof CreditNote && (field.getName().equals("linkedInvoice")
+						|| field.getName().equals("creditNoteId")
+						|| field.getName().equals("creditNoteRevisionNumber")
+						|| field.getName().equals("status")
+						|| field.getName().equals("creditNoteDate")
+						|| field.getName().equals("entry"))){
+					continue;
+				}
+				
 				if(entityJson.has(field.getName())){
 					System.out.println("Storing "+ "Field " + field.getName() + " of class " + field.getType().getCanonicalName());
 					Object entityObject = entityJson.get(field.getName());
@@ -223,7 +234,7 @@ public class HibernateUtil {
 			}
 		}
 		
-		entity.setVersion(DB_VERSION);
+		//entity.setVersion(DB_VERSION);
 		entity.setLastUpdate(SystemUtils.getFormattedDate());
 	}
 	
@@ -282,9 +293,14 @@ public class HibernateUtil {
 					continue;
 				}
 				
+				if(entity instanceof PackingList && field.getType().isAssignableFrom(SalesOrder.class)){
+					continue;
+				}
+				
 				if(field.getType().isAssignableFrom(SalesOrder.Status.class)
 						||  field.getType().isAssignableFrom(PackingList.Status.class)
-						|| field.getType().isAssignableFrom(Invoice.Status.class)){
+						|| field.getType().isAssignableFrom(Invoice.Status.class)
+						|| field.getType().isAssignableFrom(CreditNote.Status.class)){
 					entityJson.put(field.getName(), field.get(entity));
 					continue;
 				}
@@ -371,6 +387,8 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(AdValUser.class);      
         	configuration.addAnnotatedClass(Bank.class);
         	configuration.addAnnotatedClass(Brand.class);
+        	configuration.addAnnotatedClass(CreditNote.class);
+        	configuration.addAnnotatedClass(CreditNoteEntry.class);
         	configuration.addAnnotatedClass(Color.class);
         	configuration.addAnnotatedClass(ColorCode.class);
         	configuration.addAnnotatedClass(Customer.class);

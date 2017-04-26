@@ -96,7 +96,7 @@ public class ColorCodeDao {
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			resultsJson = SystemUtils.generateErrorMessage(e.getMessage());
+			resultsJson = SystemUtils.generateErrorMessage(e);
 		} finally {
 			if(session!=null){
 				session.close();
