@@ -1,6 +1,5 @@
 package com.onequbit.advaloram.hibernate.dao;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.entity.Location;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Bank;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
@@ -94,7 +94,7 @@ public class BankDao {
 	 * @param bankJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateBank(Long id, JSONObject bankJson){
+	public static JSONObject createOrUpdateBank(Long id, JSONObject bankJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -120,6 +120,7 @@ public class BankDao {
 					session.update(bank);
 				} else {
 					bank.setRecordCreationTime(SystemUtils.getFormattedDate());	
+					bank.setCreatedBy(session.get(AdValUser.class, userId));
 					session.save(bank);					
 				}
 				session.getTransaction().commit();						

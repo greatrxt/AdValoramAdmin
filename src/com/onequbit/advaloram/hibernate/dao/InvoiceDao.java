@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.PackingList;
@@ -262,7 +263,7 @@ public class InvoiceDao {
 	 * Update does not make changes in existing record. Update creates a new record with +1 revision number. 
 	 * @return
 	 */
-	public static JSONObject createOrUpdateInvoice(Long id, JSONObject invoiceJson){
+	public static JSONObject createOrUpdateInvoice(Long id, JSONObject invoiceJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -305,6 +306,7 @@ public class InvoiceDao {
 			} else {
 				invoice.setRecordCreationTime(SystemUtils.getFormattedDate());	
 				invoice.setInvoiceDate(SystemUtils.getFormattedDate());
+				invoice.setCreatedBy(session.get(AdValUser.class, userId));
 				session.save(invoice);	//create new revision only if invoice is not open
 			}					
 			session.getTransaction().commit();						

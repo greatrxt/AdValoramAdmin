@@ -1,6 +1,7 @@
 package com.onequbit.advaloram.rest;
 
 import java.io.InputStream;
+import java.security.Principal;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -14,14 +15,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.BankDao;
+import com.onequbit.advaloram.hibernate.entity.Role;
 import com.onequbit.advaloram.util.SystemUtils;
 
+@Secured({Role.ADMINISTRATOR})
 @Path("bank")
 public class BankService {
 
@@ -31,6 +35,7 @@ public class BankService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllBanks(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
+		
 		JSONObject result;
 		try {
 			result = new JSONObject();
@@ -50,15 +55,18 @@ public class BankService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response createBank(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext){
+			InputStream is, @Context ServletContext servletContext, @Context SecurityContext securityContext){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
 		logger.info("\n\n\n\nReceived Request to create bank. Incoming JSON : " +inputStreamArray);		
 		
 		JSONObject result;
 		try {
+			Principal principal = securityContext.getUserPrincipal();
+			Long userId = Long.valueOf(principal.getName());
+			
 			result = new JSONObject();
-			result = BankDao.createOrUpdateBank((long) -1, inputStreamArray);
+			result = BankDao.createOrUpdateBank((long) -1, inputStreamArray, userId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -83,7 +91,7 @@ public class BankService {
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = BankDao.createOrUpdateBank(id, inputStreamArray);
+			result = BankDao.createOrUpdateBank(id, inputStreamArray, (long) -1);	//not saving. So no userId required
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

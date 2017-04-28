@@ -18,8 +18,10 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.GenderDao;
+import com.onequbit.advaloram.hibernate.entity.Role;
 import com.onequbit.advaloram.util.SystemUtils;
 
+@Secured({Role.ADMINISTRATOR})
 @Path("gender")
 public class GenderService {
 

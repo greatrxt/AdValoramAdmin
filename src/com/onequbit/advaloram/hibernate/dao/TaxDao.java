@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Tax;
 import com.onequbit.advaloram.util.HibernateUtil;
@@ -93,7 +94,7 @@ public class TaxDao {
 	 * @param taxJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateTax(Long id, JSONObject taxJson){
+	public static JSONObject createOrUpdateTax(Long id, JSONObject taxJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -117,7 +118,8 @@ public class TaxDao {
 				if(id > 0){
 					session.update(tax);
 				} else {
-					tax.setRecordCreationTime(SystemUtils.getFormattedDate());	
+					tax.setRecordCreationTime(SystemUtils.getFormattedDate());
+					tax.setCreatedBy(session.get(AdValUser.class, userId));
 					session.save(tax);					
 				}
 				session.getTransaction().commit();						

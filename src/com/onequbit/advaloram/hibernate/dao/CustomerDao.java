@@ -14,6 +14,8 @@ import org.json.JSONObject;
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Product;
+import com.onequbit.advaloram.hibernate.entity.Transporter;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
@@ -181,12 +183,16 @@ public class CustomerDao {
 		return resultsJson;
 	}
 	
+	public static final class Tag {
+		public static final String LINKED_TRANSPORTER = "linkedTransporter";
+	}
+	
 	/**
 	 * 
 	 * @param customerJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateCustomer(Long id, JSONObject customerJson){
+	public static JSONObject createOrUpdateCustomer(Long id, JSONObject customerJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -209,9 +215,14 @@ public class CustomerDao {
 				
 				session.beginTransaction();
 				customer.setCity(session.load(Location.class, Long.parseLong(customerJson.getString("city"))));
+				if(customerJson.has(Tag.LINKED_TRANSPORTER)){
+					customer.setLinkedTransporter(session.load(Transporter.class, Long.parseLong(String.valueOf((customerJson.get(Tag.LINKED_TRANSPORTER))))));
+				}
+				
 							
 				if(id < 0){
 					customer.setRecordCreationTime(SystemUtils.getFormattedDate());		
+					customer.setCreatedBy(session.get(AdValUser.class, userId));
 					session.save(customer);					
 				} else {
 					session.update(customer);

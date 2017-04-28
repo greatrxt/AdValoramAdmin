@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.ProductDao.Tag;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.Location;
@@ -235,7 +236,7 @@ public class SalesOrderDao {
 	 * Update does not make changes in existing record. Update creates a new record with +1 revision number. 
 	 * @return
 	 */
-	public static JSONObject createOrUpdateSalesOrder(Long id, JSONObject salesOrderJson){
+	public static JSONObject createOrUpdateSalesOrder(Long id, JSONObject salesOrderJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -309,6 +310,7 @@ public class SalesOrderDao {
 			} else {
 				salesOrder.setRecordCreationTime(SystemUtils.getFormattedDate());	
 				salesOrder.setSalesOrderDate(SystemUtils.getFormattedDate());
+				salesOrder.setCreatedBy(session.get(AdValUser.class, userId));
 				session.save(salesOrder);
 			}
 			session.getTransaction().commit();						

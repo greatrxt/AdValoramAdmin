@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.hibernate.entity.Transporter;
 import com.onequbit.advaloram.util.HibernateUtil;
@@ -94,7 +95,7 @@ public class TransporterDao {
 	 * @param transporterJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateTransporter(Long id, JSONObject transporterJson){
+	public static JSONObject createOrUpdateTransporter(Long id, JSONObject transporterJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -120,6 +121,7 @@ public class TransporterDao {
 								
 				if(id < 0){
 					transporter.setRecordCreationTime(SystemUtils.getFormattedDate());	
+					transporter.setCreatedBy(session.get(AdValUser.class, userId));
 					session.save(transporter);
 				} else {
 					session.update(transporter);

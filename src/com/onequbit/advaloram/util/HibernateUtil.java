@@ -321,7 +321,7 @@ public class HibernateUtil {
 					int i = 0;
 					for(Object subEntity: subEntityCollection){
 						JSONObject subEntityJson = new JSONObject();
-						System.out.println("INSIDE FOR "  + (i++)+" "+subEntityCollection.size() + " F = "+f+"/"+fields.length);
+						//System.out.println("INSIDE FOR "  + (i++)+" "+subEntityCollection.size() + " F = "+f+"/"+fields.length);
 						loadEntityDataIntoJson(subEntity, subEntity.getClass().getDeclaredFields(), subEntityJson);
 						collectionArray.put(subEntityJson);
 					}
@@ -356,12 +356,14 @@ public class HibernateUtil {
 					
 					entityJson.put(field.getName(), collectionArray);
 					
-				} else {
+				} else if(field.getType().getSuperclass().isAssignableFrom(AbstractAdValoramEntity.class)){
 					
 					JSONObject subEntityJson = new JSONObject();
 					loadEntityDataIntoJson(field.get(entity), field.get(entity).getClass().getDeclaredFields(), subEntityJson);
 					entityJson.put(field.getName(), subEntityJson);
 					
+				} else {
+					System.out.println("Error for field - " + field.getName() + " Class Name - " + field.get(entity).getClass());
 				}
 			} catch (Exception e) {
 				System.out.println("Error for field - " + field.getName());
@@ -408,8 +410,7 @@ public class HibernateUtil {
         	configuration.addAnnotatedClass(StockKeepingUnit.class);
         	configuration.addAnnotatedClass(Tax.class);
         	configuration.addAnnotatedClass(Transporter.class);
-        	configuration.addAnnotatedClass(UnitOfMeasurement.class);        	
-        	
+        	configuration.addAnnotatedClass(UnitOfMeasurement.class);        	    
         	
         	SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         	

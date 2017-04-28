@@ -27,7 +27,9 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.FileDao;
+import com.onequbit.advaloram.hibernate.entity.Role;
 
+@Secured({Role.ADMINISTRATOR})
 @Path("upload")	//same as UPLOAD_FOLDER_NAME
 public class FileService {
 

@@ -19,8 +19,9 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.AbstractEntityDao;
+import com.onequbit.advaloram.hibernate.entity.Role;
 import com.onequbit.advaloram.util.SystemUtils;
-
+@Secured({Role.ADMINISTRATOR})
 @Path("common")
 public class CommonService {
 

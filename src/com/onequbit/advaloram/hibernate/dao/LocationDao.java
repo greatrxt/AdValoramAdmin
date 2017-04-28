@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Color;
 import com.onequbit.advaloram.hibernate.entity.Location;
 import com.onequbit.advaloram.util.HibernateUtil;
@@ -102,7 +103,7 @@ public class LocationDao {
 	 * @param locationJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateLocation(Long id, JSONObject locationJson){
+	public static JSONObject createOrUpdateLocation(Long id, JSONObject locationJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -126,7 +127,8 @@ public class LocationDao {
 				if(id > 0){
 					session.update(location);
 				} else {
-					location.setRecordCreationTime(SystemUtils.getFormattedDate());					
+					location.setRecordCreationTime(SystemUtils.getFormattedDate());	
+					location.setCreatedBy(session.get(AdValUser.class, userId));
 					session.save(location);
 				}
 				session.getTransaction().commit();						

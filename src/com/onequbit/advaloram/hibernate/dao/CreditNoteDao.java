@@ -17,6 +17,7 @@ import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.Invoice;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.CreditNote;
 import com.onequbit.advaloram.hibernate.entity.CreditNoteEntry;
 import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
@@ -233,7 +234,7 @@ public class CreditNoteDao {
 	 * Update does not make changes in existing record. Update creates a new record with +1 revision number. 
 	 * @return
 	 */
-	public static JSONObject createOrUpdateCreditNote(Long id, JSONObject creditNoteJson){
+	public static JSONObject createOrUpdateCreditNote(Long id, JSONObject creditNoteJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -300,6 +301,7 @@ public class CreditNoteDao {
 			} else {
 				creditNote.setRecordCreationTime(SystemUtils.getFormattedDate());	
 				creditNote.setCreditNoteDate(SystemUtils.getFormattedDate());
+				creditNote.setCreatedBy(session.get(AdValUser.class, userId));
 				session.save(creditNote);
 			}
 

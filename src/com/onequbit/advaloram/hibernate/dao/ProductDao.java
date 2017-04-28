@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Brand;
 import com.onequbit.advaloram.hibernate.entity.Color;
 import com.onequbit.advaloram.hibernate.entity.ColorCode;
@@ -162,7 +163,7 @@ public class ProductDao {
 	 * @param productJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateProduct(Long id, JSONObject productJson){
+	public static JSONObject createOrUpdateProduct(Long id, JSONObject productJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -219,6 +220,7 @@ public class ProductDao {
 				product.setSizeCodes(sizes);
 				if(id < 0){
 					product.setRecordCreationTime(SystemUtils.getFormattedDate());
+					product.setCreatedBy(session.get(AdValUser.class, userId));
 					session.save(product);					
 				} else {
 					session.update(product);
@@ -231,7 +233,7 @@ public class ProductDao {
 				}
 				
 				Long idForSku = product.getId();			
-				createStockKeepingUnitsFor(idForSku, productJson);
+				createStockKeepingUnitsFor(idForSku, productJson, userId);
 				result.put(Application.RESULT, Application.SUCCESS);	
 				result.put(Application.OBJECT_ID, idForSku);
 			}	
@@ -249,7 +251,7 @@ public class ProductDao {
 	 * @param id
 	 * @param productJson
 	 */
-	private static void createStockKeepingUnitsFor(Long id, JSONObject productJson) {
+	private static void createStockKeepingUnitsFor(Long id, JSONObject productJson, Long userId) {
 		
 		Session session = null;
 		
@@ -302,6 +304,7 @@ public class ProductDao {
 						if(StockKeepingUnitDao.getStockKeepingUnit(sku) == null){
 							skus.add(sku);
 							sku.setRecordCreationTime(SystemUtils.getFormattedDate());
+							sku.setCreatedBy(session.get(AdValUser.class, userId));
 							session.save(sku);
 						}
 					}

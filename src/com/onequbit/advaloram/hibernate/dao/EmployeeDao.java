@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.entity.Location;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
@@ -94,7 +95,7 @@ public class EmployeeDao {
 	 * @param employeeJson
 	 * @return
 	 */
-	public static JSONObject createOrUpdateEmployee(Long id, JSONObject employeeJson){
+	public static JSONObject createOrUpdateEmployee(Long id, JSONObject employeeJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -121,7 +122,8 @@ public class EmployeeDao {
 				}
 			
 				if(id < 0){
-					employee.setRecordCreationTime(SystemUtils.getFormattedDate());					
+					employee.setRecordCreationTime(SystemUtils.getFormattedDate());		
+					employee.setCreatedBy(session.get(AdValUser.class, userId));
 					session.save(employee);
 				} else {
 					session.update(employee);

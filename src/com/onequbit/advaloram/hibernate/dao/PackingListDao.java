@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.PackingList;
 import com.onequbit.advaloram.hibernate.entity.PackingListEntry;
@@ -331,7 +332,7 @@ public class PackingListDao {
 	 * Update does not make changes in existing record. Update creates a new record with +1 revision number. 
 	 * @return
 	 */
-	public static JSONObject createOrUpdatePackingList(Long id, JSONObject packingListJson){
+	public static JSONObject createOrUpdatePackingList(Long id, JSONObject packingListJson, Long userId){
 		
 		Session session = null;		
 		JSONObject result = new JSONObject();
@@ -425,6 +426,7 @@ public class PackingListDao {
 			if(id > 0 && packingList.getStatus().equals(PackingList.Status.OPEN)){
 				session.update(packingList);
 			} else {
+				packingList.setCreatedBy(session.get(AdValUser.class, userId));
 				session.save(packingList);					
 			}
 			session.getTransaction().commit();						
