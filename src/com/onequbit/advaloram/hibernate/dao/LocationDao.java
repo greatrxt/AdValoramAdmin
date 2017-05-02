@@ -145,4 +145,31 @@ public class LocationDao {
 		
 		return result;
 	}
+
+	/*
+	 * Delete location. Only administrator allowed
+	 */
+	public static JSONObject deleteLocation(Long id){
+		
+		JSONObject result = new JSONObject();
+		Session session = null;				
+		try {		
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction(); 
+			session.delete(session.load(Location.class, id));
+			session.getTransaction().commit();
+			result.put(Application.RESULT, Application.SUCCESS);	
+		} catch(Exception e){
+			e.printStackTrace();
+			result = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return result;
+	}
+
+
 }

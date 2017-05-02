@@ -6,6 +6,7 @@ import java.security.Principal;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -91,6 +92,26 @@ public class LocationService {
 		try {
 			result = new JSONObject();
 			result = LocationDao.createOrUpdateLocation(id, inputStreamArray, (long) -1);	//not saving. So no userId required
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@DELETE
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response deleteLocation(@Context HttpServletRequest request, 
+			 @Context ServletContext servletContext, @PathParam("id") String id){
+
+		JSONObject result;
+		try {
+			result = LocationDao.deleteLocation(Long.valueOf(id));	
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

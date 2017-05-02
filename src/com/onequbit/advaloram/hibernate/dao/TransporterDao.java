@@ -126,7 +126,8 @@ public class TransporterDao {
 				} else {
 					session.update(transporter);
 				}
-				session.getTransaction().commit();						
+				session.getTransaction().commit();		
+				result.put("objectId", transporter.getId());
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		
 		} catch(Exception e){

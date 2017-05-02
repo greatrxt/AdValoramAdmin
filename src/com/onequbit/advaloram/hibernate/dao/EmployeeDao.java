@@ -129,7 +129,8 @@ public class EmployeeDao {
 					session.update(employee);
 				}
 									
-				session.getTransaction().commit();						
+				session.getTransaction().commit();	
+				result.put("objectId", employee.getId());
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		
 		} catch(Exception e){

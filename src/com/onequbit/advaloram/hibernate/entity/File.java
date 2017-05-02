@@ -12,11 +12,17 @@ public class File extends AbstractAdValoramEntity {
 	 * 
 	 */
 	private static final long serialVersionUID = 6463966430818014231L;
-	
+	public long id;
 	public String name;
 	public String fileLocation;
 	public String format;
 	
+	
+	@Column(name="id")
+	public Long getId() {
+		return id;
+	}
+
 	@Column(name="file_name")
 	public String getName() {
 		return name;
@@ -29,6 +35,11 @@ public class File extends AbstractAdValoramEntity {
 	public String getFileLocation() {
 		return fileLocation;
 	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+	
 	public void setFileLocation(String fileLocation) {
 		this.fileLocation = fileLocation;
 	}

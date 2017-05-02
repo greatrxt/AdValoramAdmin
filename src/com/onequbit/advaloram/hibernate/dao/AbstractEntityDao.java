@@ -145,6 +145,30 @@ public class AbstractEntityDao {
 		return resultsJson;
 	}
 	
+	/**
+	 * Delete object. Only administrator allowed
+	 */
+	public static JSONObject deleteObject(String entityClassName, Long id){
+		
+		JSONObject result = new JSONObject();
+		Session session = null;				
+		try {		
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction(); 
+			session.delete(session.load(getClassByName(entityClassName), id));
+			session.getTransaction().commit();
+			result.put(Application.RESULT, Application.SUCCESS);	
+		} catch(Exception e){
+			e.printStackTrace();
+			result = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return result;
+	}
 
 	/**
 	 * Get all Objects

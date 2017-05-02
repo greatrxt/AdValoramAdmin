@@ -97,30 +97,32 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // Check if it was issued by the server and if it's not expired
         // Throw an Exception if the token is invalid
 		Session session = null;
-		try {
-			
-			session = HibernateUtil.getSessionAnnotationFactory().openSession();
-			session.beginTransaction();
-			
-			Criteria criteria = session.createCriteria(AdValUser.class);
-			criteria.add(Restrictions.eq("token", token));
+		if(!token.trim().isEmpty()){
+			try {
+				
+				session = HibernateUtil.getSessionAnnotationFactory().openSession();
+				session.beginTransaction();
+				
+				Criteria criteria = session.createCriteria(AdValUser.class);
+				criteria.add(Restrictions.eq("token", token));
 
-			List<AdValUser> list = criteria.list();
-			if(list.size() == 1){
-				AdValUser user = list.iterator().next();
-	            username = String.valueOf(user.getId());
-				return;
-			} 
-			
-		} catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		} finally {
-			if(session!=null){
-				session.close();
+				List<AdValUser> list = criteria.list();
+				if(list.size() == 1){
+					AdValUser user = list.iterator().next();
+		            username = String.valueOf(user.getId());
+					return;
+				} 
+				
+			} catch(Exception e){
+				e.printStackTrace();
+				throw e;
+			} finally {
+				if(session!=null){
+					session.close();
+				}
 			}
 		}
-		
+	
 		throw new NotAuthorizedException("Username and password combination not found");
     }
     

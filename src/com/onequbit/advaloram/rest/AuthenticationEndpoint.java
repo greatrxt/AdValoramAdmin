@@ -1,6 +1,7 @@
 package com.onequbit.advaloram.rest;
 
 import java.math.BigInteger;
+import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
@@ -12,8 +13,10 @@ import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -45,6 +48,22 @@ public class AuthenticationEndpoint {
         }      
     }
 
+    @Secured({Role.ADMINISTRATOR})
+    @POST
+    @Path("/logout")
+    public Response logoutUser(@Context SecurityContext securityContext) {
+
+        try {
+        	Principal principal = securityContext.getUserPrincipal();
+			Long userId = Long.valueOf(principal.getName());
+			logout(userId);
+            return Response.ok().build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }      
+    }
+    
     @Secured({Role.ADMINISTRATOR})	//secured URL to test whether user has been authenticated
     @GET
     public Response isUserAuthenticated() {
@@ -55,6 +74,29 @@ public class AuthenticationEndpoint {
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}      
 	}
+    
+    private void logout(Long userId){
+    	Session session = null;
+		try {
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+	
+			AdValUser user = session.get(AdValUser.class, userId);
+            user.setToken("");
+            session.update(user);
+            session.getTransaction().commit();
+	 
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+    }
     
     private String authenticateAndGenerateToken(String username, String password) throws Exception {
         // Authenticate against a database, LDAP, file or whatever

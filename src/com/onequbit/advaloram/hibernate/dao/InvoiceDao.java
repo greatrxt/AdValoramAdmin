@@ -277,7 +277,9 @@ public class InvoiceDao {
 				invoice = getInvoiceLatestRevision(id);
 							
 				if(invoice != null){
-					invoiceRevisionNumber = invoice.getInvoiceRevisionNumber() + 1;
+					if(!invoice.getStatus().equals(Invoice.Status.OPEN)){	//increase revision number only if Invoice not open
+						invoiceRevisionNumber = invoice.getInvoiceRevisionNumber() + 1;
+					}
 				}
 				
 			} else {

@@ -174,7 +174,7 @@ public class HibernateUtil {
 						|| field.getName().equals("creditNoteId")
 						|| field.getName().equals("creditNoteRevisionNumber")
 						|| field.getName().equals("status")
-						|| field.getName().equals("creditNoteDate")
+						|| field.getName().equals("returnDate")
 						|| field.getName().equals("entry"))){
 					continue;
 				}
@@ -276,6 +276,10 @@ public class HibernateUtil {
 					continue;
 				}
 				
+				if(entity instanceof AdValUser && field.getName().equals("token")
+						|| entity instanceof AdValUser && field.getName().equals("password")){
+					continue;
+				}
 				//circular reference
 				if((entity instanceof Employee && field.getType().isAssignableFrom(Employee.class))){
 						entityJson.put(field.getName(), ((Employee)field.get(entity)).getId());

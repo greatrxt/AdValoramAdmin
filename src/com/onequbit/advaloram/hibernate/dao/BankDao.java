@@ -124,7 +124,8 @@ public class BankDao {
 					session.save(bank);					
 				}
 				session.getTransaction().commit();						
-				result.put(Application.RESULT, Application.SUCCESS);				
+				result.put(Application.RESULT, Application.SUCCESS);
+				result.put("objectId", bank.getId());
 			}		
 		} catch(Exception e){
 			e.printStackTrace();

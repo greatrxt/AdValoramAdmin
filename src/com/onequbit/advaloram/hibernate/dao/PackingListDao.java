@@ -346,7 +346,9 @@ public class PackingListDao {
 				packingList = getPackingListLatestRevision(id);
 							
 				if(packingList != null){
-					packingListRevisionNumber = packingList.getPackingListRevisionNumber() + 1;
+					if(!packingList.getStatus().equals(PackingList.Status.OPEN)){	//increase revision number only if PL not open
+						packingListRevisionNumber = packingList.getPackingListRevisionNumber() + 1;
+					}
 				}
 				
 			} else {

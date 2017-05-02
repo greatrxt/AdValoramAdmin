@@ -216,7 +216,9 @@ public class CustomerDao {
 				session.beginTransaction();
 				customer.setCity(session.load(Location.class, Long.parseLong(customerJson.getString("city"))));
 				if(customerJson.has(Tag.LINKED_TRANSPORTER)){
-					customer.setLinkedTransporter(session.load(Transporter.class, Long.parseLong(String.valueOf((customerJson.get(Tag.LINKED_TRANSPORTER))))));
+					if(!String.valueOf((customerJson.get(Tag.LINKED_TRANSPORTER))).trim().isEmpty()){
+						customer.setLinkedTransporter(session.load(Transporter.class, Long.parseLong(String.valueOf((customerJson.get(Tag.LINKED_TRANSPORTER))))));
+					}
 				}
 				
 							
@@ -227,7 +229,8 @@ public class CustomerDao {
 				} else {
 					session.update(customer);
 				}
-				session.getTransaction().commit();						
+				session.getTransaction().commit();					
+				result.put("objectId", customer.getId());
 				result.put(Application.RESULT, Application.SUCCESS);				
 			}		
 		} catch(Exception e){

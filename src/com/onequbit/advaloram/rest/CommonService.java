@@ -5,6 +5,7 @@ import java.io.InputStream;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.AbstractEntityDao;
+import com.onequbit.advaloram.hibernate.dao.LocationDao;
 import com.onequbit.advaloram.hibernate.entity.Role;
 import com.onequbit.advaloram.util.SystemUtils;
 @Secured({Role.ADMINISTRATOR})
@@ -81,6 +83,28 @@ public class CommonService {
 		try {
 			result = new JSONObject();
 			//result = CommonDao.createEntity(entityClass, inputStreamArray);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@DELETE
+	@Path("/{entityClassName}/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response deleteCommon(@Context HttpServletRequest request, 
+			 @Context ServletContext servletContext,
+			 @PathParam("entityClassName") String entityClassName,
+			 @PathParam("id") String id){
+
+		JSONObject result;
+		try {
+			result = AbstractEntityDao.deleteObject(entityClassName, Long.valueOf(id));	
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

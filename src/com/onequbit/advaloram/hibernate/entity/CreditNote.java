@@ -47,7 +47,7 @@ public class CreditNote extends AbstractAdValoramEntity {
 	
 	public String returnNote;
 	
-	public Date creditNoteDate;
+	public Date returnDate;
 	
 	public Set<CreditNoteEntry> entry;
 
@@ -102,9 +102,9 @@ public class CreditNote extends AbstractAdValoramEntity {
 		return returnNote;
 	}
 
-	@Column(name="credit_note_date")
-	public Date getCreditNoteDate() {
-		return creditNoteDate;
+	@Column(name="return_date")
+	public Date getReturnDate() {
+		return returnDate;
 	}
 
 	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
@@ -156,8 +156,8 @@ public class CreditNote extends AbstractAdValoramEntity {
 		this.returnNote = returnNote;
 	}
 
-	public void setCreditNoteDate(Date creditNoteDate) {
-		this.creditNoteDate = creditNoteDate;
+	public void setReturnDate(Date returnDate) {
+		this.returnDate = returnDate;
 	}
 
 	public void setEntry(Set<CreditNoteEntry> entry) {

@@ -3,11 +3,16 @@ package com.onequbit.advaloram.rest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -20,7 +25,10 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.media.multipart.BodyPartEntity;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,7 +37,7 @@ import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.FileDao;
 import com.onequbit.advaloram.hibernate.entity.Role;
 
-@Secured({Role.ADMINISTRATOR})
+//@Secured({Role.ADMINISTRATOR})
 @Path("upload")	//same as UPLOAD_FOLDER_NAME
 public class FileService {
 
@@ -52,6 +60,33 @@ public class FileService {
         return response.build();  
    
     }  
+
+	@DELETE  
+    @Path("/{entityClass}/{id}/{fileId}")  
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response deleteFile(@Context ServletContext servletContext, @Context UriInfo uriInfo,
+    		@PathParam("entityClass") String entityClass,  @PathParam("id") Long id, @PathParam("fileId") Long fileId) { 
+		
+		JSONObject result = new JSONObject();
+		
+		try {
+			File uploadFolder = 
+					new File(servletContext.getRealPath(UPLOAD_FOLDER_NAME) + File.separator + entityClass + File.separator + id);
+			
+			FileDao.deleteEntry(entityClass, id, fileId, uploadFolder);
+			result.put(Application.RESULT, Application.SUCCESS);
+			
+		} catch(Exception e){
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+   
+    } 
 	
 	@GET  
     @Path("/{entityClass}/{id}")  
@@ -140,4 +175,45 @@ public class FileService {
     		
     		return Response.status(Response.Status.OK).entity(result.toString()).build();
         }  
+	
+	@Path("/files2")
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public Response uploadFiles(final FormDataMultiPart multiPart) {
+
+		List<FormDataBodyPart> bodyParts = multiPart.getFields("files");
+
+		StringBuffer fileDetails = new StringBuffer("");
+
+		/* Save multiple files */
+		for (int i = 0; i < bodyParts.size(); i++) {
+			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyParts.get(i).getEntity();
+			String fileName = bodyParts.get(i).getContentDisposition().getFileName();
+			saveFile(bodyPartEntity.getInputStream(), fileName);
+			fileDetails.append(" File saved at /Volumes/Drive2/temp/file/" + fileName);
+		}
+
+		/* Save File 2 */
+
+		BodyPartEntity bodyPartEntity = ((BodyPartEntity) multiPart.getField("file2").getEntity());
+		String file2Name = multiPart.getField("file2").getFormDataContentDisposition().getFileName();
+		saveFile(bodyPartEntity.getInputStream(), file2Name);
+		fileDetails.append(" File saved at /Volumes/Drive2/temp/file/" + file2Name);
+
+		fileDetails.append(" Tag Details : " + multiPart.getField("tags").getValue());
+		System.out.println(fileDetails);
+
+		return Response.ok(fileDetails.toString()).build();
+	}
+
+	private void saveFile(InputStream file, String name) {
+		try {
+			/* Change directory path */
+			java.nio.file.Path path = FileSystems.getDefault().getPath("/Volumes/Drive2/temp/file/" + name);
+			/* Save InputStream as file */
+			Files.copy(file, path);
+		} catch (IOException ie) {
+			ie.printStackTrace();
+		}
+	}
 }

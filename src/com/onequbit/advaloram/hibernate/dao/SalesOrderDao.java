@@ -250,7 +250,9 @@ public class SalesOrderDao {
 				salesOrder = getSalesOrderLatestRevision(id);
 							
 				if(salesOrder != null){
-					salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber() + 1;
+					if(!salesOrder.getStatus().equals(SalesOrder.Status.OPEN)){	//increase revision number only if SO not open
+						salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber() + 1;
+					}					
 				}
 				
 			} else {

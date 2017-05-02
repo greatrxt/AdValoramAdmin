@@ -1,5 +1,7 @@
 package com.onequbit.advaloram.hibernate.dao;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +19,7 @@ import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.Invoice;
+import com.onequbit.advaloram.hibernate.entity.PackingList;
 import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.CreditNote;
 import com.onequbit.advaloram.hibernate.entity.CreditNoteEntry;
@@ -213,6 +216,7 @@ public class CreditNoteDao {
 	
 	public static class Tag {
 		public static final String CUSTOMER_ID = "linkedCustomer", EMPLOYEE_ID = "referredByEmployee", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", COLOR_CODE = "colorCode",
+				RETURN_DATE = "returnDate",
 				GENDER_CODE = "genderCode", LINKED_INVOICE_ID = "linkedInvoiceId",
 				QTY_SIZE_28 = "quantityForSize28",
 						QTY_SIZE_30 = "quantityForSize30",
@@ -248,7 +252,9 @@ public class CreditNoteDao {
 				creditNote = getCreditNoteLatestRevision(id);
 							
 				if(creditNote != null){
-					creditNoteRevisionNumber = creditNote.getCreditNoteRevisionNumber() + 1;
+					if(!creditNote.getStatus().equals(CreditNote.Status.OPEN)){	//increase revision number only if CN not open
+						creditNoteRevisionNumber = creditNote.getCreditNoteRevisionNumber() + 1;
+					}
 				}
 				
 			} else {
@@ -292,7 +298,9 @@ public class CreditNoteDao {
 			}
 			
 			creditNote.setEntry(entry);
+			DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 			
+			creditNote.setReturnDate(format.parse(creditNoteJson.getString(Tag.RETURN_DATE)));
 			creditNote.setCreditNoteRevisionNumber(creditNoteRevisionNumber);
 			creditNote.setLinkedInvoice(InvoiceDao.getInvoiceLatestRevision(Long.valueOf(String.valueOf(creditNoteJson.get(Tag.LINKED_INVOICE_ID)))));
 			
@@ -300,7 +308,6 @@ public class CreditNoteDao {
 				session.update(creditNote);
 			} else {
 				creditNote.setRecordCreationTime(SystemUtils.getFormattedDate());	
-				creditNote.setCreditNoteDate(SystemUtils.getFormattedDate());
 				creditNote.setCreatedBy(session.get(AdValUser.class, userId));
 				session.save(creditNote);
 			}
