@@ -74,6 +74,12 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	
 	public float specialDiscountOnSalesOrderDate;
 	
+/*	public float cstRateApplicableOnSalesOrderDate;
+	public float vatRateApplicableOnSalesOrderDate;
+	public float cstRateAgainstFormCOnSalesOrderDate;
+	public float gstRateApplicableOnSalesOrderDate;
+	public float octroiLbtEntryTaxApplicableOnSalesOrderDate;*/
+	
 	public String notes;
 	
 	public String revisionReason;
@@ -82,8 +88,8 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	
 	public Status status;
 	
-	public enum Status {
-		OPEN, CONFIRMED, DISPATCHED, CANCELLED 
+	public static enum Status {
+		OPEN, CONFIRMED, DISPATCHED, CANCELLED, UNDER_REVISION
 	}
 	
 	@Column(name="id")
@@ -224,6 +230,35 @@ public class SalesOrder extends AbstractAdValoramEntity {
 		return revisionReason;
 	}
 	
+
+	/*@Column(name="cst_rate_applicable")
+	public float getCstRateApplicableOnSalesOrderDate() {
+		return cstRateApplicableOnSalesOrderDate;
+	}
+
+
+
+	@Column(name="vat_rate_applicable_on_sales_order_date")
+	public float getVatRateApplicableOnSalesOrderDate() {
+		return vatRateApplicableOnSalesOrderDate;
+	}
+
+
+	@Column(name="cst_rate_against_form_c_on_sales_order_date")
+	public float getCstRateAgainstFormCOnSalesOrderDate() {
+		return cstRateAgainstFormCOnSalesOrderDate;
+	}
+
+	@Column(name="gst_rate_applicable_on_sales_order_date")
+	public float getGstRateApplicableOnSalesOrderDate() {
+		return gstRateApplicableOnSalesOrderDate;
+	}
+
+	@Column(name="octroi_lbt_entry_tax_applicable_on_sales_order_date")
+	public float getOctroiLbtEntryTaxApplicableOnSalesOrderDate() {
+		return octroiLbtEntryTaxApplicableOnSalesOrderDate;
+	}*/
+
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -305,6 +340,26 @@ public class SalesOrder extends AbstractAdValoramEntity {
 		this.entry = entry;
 	}
 
+/*	public void setOctroiLbtEntryTaxApplicableOnSalesOrderDate(float octroiLbtEntryTaxApplicableOnSalesOrderDate) {
+		this.octroiLbtEntryTaxApplicableOnSalesOrderDate = octroiLbtEntryTaxApplicableOnSalesOrderDate;
+	}
+
+	public void setGstRateApplicableOnSalesOrderDate(float gstRateApplicableOnSalesOrderDate) {
+		this.gstRateApplicableOnSalesOrderDate = gstRateApplicableOnSalesOrderDate;
+	}
+
+	public void setCstRateAgainstFormCOnSalesOrderDate(float cstRateAgainstFormCOnSalesOrderDate) {
+		this.cstRateAgainstFormCOnSalesOrderDate = cstRateAgainstFormCOnSalesOrderDate;
+	}
+	
+	public void setVatRateApplicableOnSalesOrderDate(float vatRateApplicableOnSalesOrderDate) {
+		this.vatRateApplicableOnSalesOrderDate = vatRateApplicableOnSalesOrderDate;
+	}
+	
+	public void setCstRateApplicableOnSalesOrderDate(float cstRateApplicableOnSalesOrderDate) {
+		this.cstRateApplicableOnSalesOrderDate = cstRateApplicableOnSalesOrderDate;
+	}*/
+	
 	public void setMarkDownOnSalesOrderDate(float markDownOnSalesOrderDate) {
 		this.markDownOnSalesOrderDate = markDownOnSalesOrderDate;
 	}
@@ -328,6 +383,4 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	public void setAssociatedFiles(Set<File> associatedFiles) {
 		this.associatedFiles = associatedFiles;
 	}
-	
-	
 }

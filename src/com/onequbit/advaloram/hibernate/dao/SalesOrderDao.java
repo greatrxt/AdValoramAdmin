@@ -230,6 +230,56 @@ public class SalesOrderDao {
 																								ENTRY_ID = "id";
 	}
 	
+	
+	/**
+	 * When user clicks on edit button
+	 * @param id
+	 * @param salesOrderJson
+	 * @param userId
+	 * @return
+	 */
+	public static JSONObject createNewRevisionOfSalesOrder(Long salesOrderId, Long userId){
+		Session session = null;		
+		JSONObject result = new JSONObject();
+		SalesOrder salesOrder = null;
+		try {	
+			
+			salesOrder = getSalesOrderLatestRevision(salesOrderId);
+			if(salesOrder == null){
+				throw new Exception("Sales order with ID " + salesOrderId + " not found" );					
+			}
+			
+			//check if record has already been created
+			if(salesOrder.getStatus().equals(SalesOrder.Status.UNDER_REVISION)){
+				result.put(Application.RESULT, Application.SUCCESS);
+				result.put("objectId", salesOrder.getId());
+				result.put("salesOrderId", salesOrder.getSalesOrderId());
+				return result;
+			}
+			
+			int salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber() + 1;
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			salesOrder.setSalesOrderRevisionNumber(salesOrderRevisionNumber);
+			salesOrder.setStatus(SalesOrder.Status.UNDER_REVISION);
+			salesOrder.setRecordCreationTime(SystemUtils.getFormattedDate());	
+			salesOrder.setCreatedBy(session.get(AdValUser.class, userId));
+			session.save(salesOrder);
+			
+			session.getTransaction().commit();						
+			result.put(Application.RESULT, Application.SUCCESS);
+			result.put("objectId", salesOrder.getId());
+			result.put("salesOrderId", salesOrder.getSalesOrderId());
+		} catch(Exception e){
+			e.printStackTrace();
+			result = SystemUtils.generateErrorMessage(e);
+		}
+		
+		return result;
+
+	}
 	/**
 	 * 
 	 * @param salesOrderJson
@@ -252,12 +302,16 @@ public class SalesOrderDao {
 				if(salesOrder != null){
 					if(!salesOrder.getStatus().equals(SalesOrder.Status.OPEN)){	//increase revision number only if SO not open
 						salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber() + 1;
-					}					
+					}
+					if(salesOrder.getStatus().equals(SalesOrder.Status.UNDER_REVISION)){	//revert back to original revision number if under revision
+						salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber();
+					}
 				}
 				
 			} else {
 				salesOrder = new SalesOrder();
-				salesOrder.setStatus(salesOrder.status.OPEN);
+				salesOrder.setStatus(SalesOrder.Status.OPEN);
+				salesOrder.setSalesOrderDate(SystemUtils.getFormattedDate());
 				salesOrder.setSalesOrderId(getNextSalesOrderIdAsLong());
 			}			
 			
@@ -307,11 +361,11 @@ public class SalesOrderDao {
 					salesOrder.setReferredByEmployee(session.load(Employee.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.EMPLOYEE_ID)))));
 			}
 
-			if(id > 0 && salesOrder.getStatus().equals(SalesOrder.Status.OPEN)){
+			if(id > 0 && (salesOrder.getStatus().equals(SalesOrder.Status.OPEN)
+					|| salesOrder.getStatus().equals(SalesOrder.Status.UNDER_REVISION))){
 				session.update(salesOrder);
 			} else {
 				salesOrder.setRecordCreationTime(SystemUtils.getFormattedDate());	
-				salesOrder.setSalesOrderDate(SystemUtils.getFormattedDate());
 				salesOrder.setCreatedBy(session.get(AdValUser.class, userId));
 				session.save(salesOrder);
 			}

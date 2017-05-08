@@ -51,7 +51,7 @@ public class Invoice extends AbstractAdValoramEntity {
 	
 	public long numberOfPackages;
 	
-	public double grossWeight;
+	public Double grossWeight;
 	
 	public String lorryReceiptNumber;
 
@@ -60,6 +60,10 @@ public class Invoice extends AbstractAdValoramEntity {
 	public int invoiceRevisionNumber;
 	
 	public Date invoiceDate;
+	
+	public Double transportationCharges;
+	
+	public Double loadingCharges;
 	
 	public enum Status {
 		OPEN, ISSUED, REVISED, CANCELLED 
@@ -133,7 +137,7 @@ public class Invoice extends AbstractAdValoramEntity {
 	}
 
 	@Column(name="gross_weight")
-	public double getGrossWeight() {
+	public Double getGrossWeight() {
 		return grossWeight;
 	}
 
@@ -167,6 +171,24 @@ public class Invoice extends AbstractAdValoramEntity {
 	@JoinColumn(name="linked_packing_list", nullable = true, referencedColumnName = "id")
 	public PackingList getLinkedPackingList() {
 		return linkedPackingList;
+	}
+	
+	@Column(name="transportation_charges")
+	public Double getTransportationCharges() {
+		return transportationCharges;
+	}
+	
+	@Column(name="loading_charges")
+	public Double getLoadingCharges() {
+		return loadingCharges;
+	}
+
+	public void setTransportationCharges(Double transportationCharges) {
+		this.transportationCharges = transportationCharges;
+	}
+
+	public void setLoadingCharges(Double loadingCharges) {
+		this.loadingCharges = loadingCharges;
 	}
 
 	public void setLinkedSalesOrder(SalesOrder linkedSalesOrder) {
@@ -210,7 +232,7 @@ public class Invoice extends AbstractAdValoramEntity {
 		this.numberOfPackages = numberOfPackages;
 	}
 
-	public void setGrossWeight(double grossWeight) {
+	public void setGrossWeight(Double grossWeight) {
 		this.grossWeight = grossWeight;
 	}
 

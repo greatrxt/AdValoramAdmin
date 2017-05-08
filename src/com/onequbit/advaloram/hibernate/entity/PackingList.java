@@ -63,7 +63,7 @@ public class PackingList extends AbstractAdValoramEntity {
 	public String revisionReason;
 	
 	public enum Status {
-		OPEN, CONFIRMED, DISPATCHED, CANCELLED 
+		OPEN, CONFIRMED, DISPATCHED, CANCELLED, UNDER_REVISION 
 	}
 		
 	@Column(name="id")

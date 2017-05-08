@@ -158,6 +158,31 @@ public class PackingListService {
 	}
 	
 	@PUT
+	@Path("/{packingListId}/edit")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response editPackingList(@Context HttpServletRequest request, 
+			@Context ServletContext servletContext, @PathParam("packingListId") Long packingListId, @Context SecurityContext securityContext){
+		
+		JSONObject result;
+		try {
+			Principal principal = securityContext.getUserPrincipal();
+			Long userId = Long.valueOf(principal.getName());
+			
+			result = new JSONObject();
+			result = PackingListDao.createNewRevisionOfPackingList(packingListId, userId);
+			
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

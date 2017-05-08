@@ -326,6 +326,55 @@ public class PackingListDao {
 																								ENTRY_ID = "id";
 	}
 	
+	
+	/**
+	 * When user clicks on edit button
+	 * @param id
+	 * @param packingListJson
+	 */
+	public static JSONObject createNewRevisionOfPackingList(Long packingListId, Long userId){
+		Session session = null;		
+		JSONObject result = new JSONObject();
+		PackingList packingList = null;
+		try {	
+			
+			packingList = getPackingListLatestRevision(packingListId);
+			if(packingList == null){
+				throw new Exception("Packing List with ID " + packingListId + " not found" );					
+			}
+			
+			//check if record has already been created
+			if(packingList.getStatus().equals(PackingList.Status.UNDER_REVISION)){
+				result.put(Application.RESULT, Application.SUCCESS);
+				result.put("objectId", packingList.getId());
+				result.put("packingListId", packingList.getPackingListId());
+				return result;
+			}
+			
+			int packingListRevisionNumber = packingList.getPackingListRevisionNumber() + 1;
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			packingList.setPackingListRevisionNumber(packingListRevisionNumber);
+			packingList.setStatus(PackingList.Status.UNDER_REVISION);
+			packingList.setRecordCreationTime(SystemUtils.getFormattedDate());	
+			packingList.setCreatedBy(session.get(AdValUser.class, userId));
+			session.save(packingList);
+			
+			session.getTransaction().commit();						
+			result.put(Application.RESULT, Application.SUCCESS);
+			result.put("objectId", packingList.getId());
+			result.put("packingListId", packingList.getPackingListId());
+		} catch(Exception e){
+			e.printStackTrace();
+			result = SystemUtils.generateErrorMessage(e);
+		}
+		
+		return result;
+
+	}
+	
 	/**
 	 * 
 	 * @param packingListJson
@@ -349,12 +398,16 @@ public class PackingListDao {
 					if(!packingList.getStatus().equals(PackingList.Status.OPEN)){	//increase revision number only if PL not open
 						packingListRevisionNumber = packingList.getPackingListRevisionNumber() + 1;
 					}
+					if(packingList.getStatus().equals(PackingList.Status.UNDER_REVISION)){	//revert back to original revision number if under revision
+						packingListRevisionNumber = packingList.getPackingListRevisionNumber();
+					}
 				}
 				
 			} else {
 				packingList = new PackingList();
 				packingList.setStatus(packingList.status.OPEN);
 				packingList.setPackingListId(getNextPackingListIdAsLong());
+				packingList.setPackingListDate(SystemUtils.getFormattedDate());
 			}			
 			
 			HibernateUtil.setDataFromJson(packingList, packingListJson);			
@@ -423,12 +476,12 @@ public class PackingListDao {
 			
 			packingList.setPackingListRevisionNumber(packingListRevisionNumber);
 			
-			packingList.setRecordCreationTime(SystemUtils.getFormattedDate());	
-			packingList.setPackingListDate(SystemUtils.getFormattedDate());
-			if(id > 0 && packingList.getStatus().equals(PackingList.Status.OPEN)){
+			if(id > 0 && (packingList.getStatus().equals(PackingList.Status.OPEN) ||
+					packingList.getStatus().equals(PackingList.Status.UNDER_REVISION))){
 				session.update(packingList);
 			} else {
 				packingList.setCreatedBy(session.get(AdValUser.class, userId));
+				packingList.setRecordCreationTime(SystemUtils.getFormattedDate());
 				session.save(packingList);					
 			}
 			session.getTransaction().commit();						

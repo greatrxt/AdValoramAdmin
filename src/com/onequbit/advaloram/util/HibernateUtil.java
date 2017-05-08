@@ -313,6 +313,8 @@ public class HibernateUtil {
 						field.getType().isAssignableFrom(Long.class) ||
 						field.getType().isAssignableFrom(Date.class) ||
 						field.getType().isAssignableFrom(Integer.class) ||
+						field.getType().isAssignableFrom(Double.class) ||
+						field.getType().isAssignableFrom(Float.class) ||
 						field.getType().isPrimitive()) {
 					
 						entityJson.put(field.getName(), field.get(entity));

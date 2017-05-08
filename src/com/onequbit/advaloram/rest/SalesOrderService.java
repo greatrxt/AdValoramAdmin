@@ -158,11 +158,36 @@ public class SalesOrderService {
 	}
 	
 	@PUT
-	@Path("/{id}")
+	@Path("/{salesOrderId}/edit")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response editSalesOrder(@Context HttpServletRequest request, 
+			@Context ServletContext servletContext, @PathParam("salesOrderId") Long salesOrderId, @Context SecurityContext securityContext){
+		
+		JSONObject result;
+		try {
+			Principal principal = securityContext.getUserPrincipal();
+			Long userId = Long.valueOf(principal.getName());
+			
+			result = new JSONObject();
+			result = SalesOrderDao.createNewRevisionOfSalesOrder(salesOrderId, userId);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	
+	@PUT
+	@Path("/{salesOrderId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response updateSalesOrder(@Context HttpServletRequest request, 
-			InputStream is, @Context ServletContext servletContext, @PathParam("id") Long id){
+			InputStream is, @Context ServletContext servletContext, @PathParam("salesOrderId") Long salesOrderId){
 		
 		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
 		logger.info("\n\n\n\nReceived Request to update salesOrder. Incoming JSON : " +inputStreamArray);		
@@ -170,7 +195,7 @@ public class SalesOrderService {
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = SalesOrderDao.createOrUpdateSalesOrder(id, inputStreamArray, (long) -1);	//not saving. So no userId required
+			result = SalesOrderDao.createOrUpdateSalesOrder(salesOrderId, inputStreamArray, (long) -1);	//not saving. So no userId required
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
