@@ -7,10 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -19,9 +15,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.collection.internal.PersistentMap;
 import org.hibernate.service.ServiceRegistry;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.onequbit.advaloram.hibernate.entity.AbstractAdValoramEntity;
 import com.onequbit.advaloram.hibernate.entity.Bank;
 import com.onequbit.advaloram.hibernate.entity.Brand;
@@ -287,8 +281,7 @@ public class HibernateUtil {
 				}
 				
 				//avoid bi directional relationships
-				if((entity instanceof Product && field.getType().isAssignableFrom(StockKeepingUnit.class)) ||
-						(entity instanceof Customer && field.getType().isAssignableFrom(Customer.class))){
+				if((entity instanceof Product && field.getType().isAssignableFrom(StockKeepingUnit.class))){
 					continue;
 				}
 				if(entity instanceof StockKeepingUnit && field.getType().isAssignableFrom(Product.class)){

@@ -287,6 +287,9 @@ public class CreditNoteDao {
 						int quantity = Integer.valueOf(String.valueOf(productJson.get(tag)).trim());
 						if(quantity > 0){
 							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size));
+							if(sku == null){
+								continue;
+							}
 							CreditNoteEntry creditNoteEntry = new CreditNoteEntry();
 							creditNoteEntry.setEntryId(entryId);
 							creditNoteEntry.setStockKeepingUnit(sku);

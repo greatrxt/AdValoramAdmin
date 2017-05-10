@@ -184,7 +184,8 @@ public class CustomerDao {
 	}
 	
 	public static final class Tag {
-		public static final String LINKED_TRANSPORTER = "linkedTransporter";
+		public static final String LINKED_TRANSPORTER = "linkedTransporter", LINKED_DISTRIBUTOR = "linkedDistributor",
+					LINKED_BROKER = "linkedBroker";
 	}
 	
 	/**
@@ -221,6 +222,25 @@ public class CustomerDao {
 					}
 				}
 				
+				customer.setLinkedDistributor(null);
+				if(customerJson.has(Tag.LINKED_DISTRIBUTOR)){
+					if(!String.valueOf((customerJson.get(Tag.LINKED_DISTRIBUTOR))).trim().isEmpty()){
+						Long linkedDistributorId = Long.valueOf(String.valueOf((customerJson.get(Tag.LINKED_DISTRIBUTOR))).trim());
+						if(linkedDistributorId > 0){
+							customer.setLinkedDistributor(session.get(Customer.class, linkedDistributorId));
+						}
+					}
+				}
+				
+				customer.setLinkedBroker(null);
+				if(customerJson.has(Tag.LINKED_BROKER)){
+					if(!String.valueOf((customerJson.get(Tag.LINKED_BROKER))).trim().isEmpty()){
+						Long linkedBrokerId = Long.valueOf(String.valueOf((customerJson.get(Tag.LINKED_BROKER))).trim());
+						if(linkedBrokerId > 0){
+							customer.setLinkedBroker(session.get(Customer.class, linkedBrokerId));
+						}
+					}
+				}
 							
 				if(id < 0){
 					customer.setRecordCreationTime(SystemUtils.getFormattedDate());		

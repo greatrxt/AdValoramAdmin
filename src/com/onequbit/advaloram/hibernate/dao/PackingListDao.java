@@ -434,6 +434,9 @@ public class PackingListDao {
 						int quantity = Integer.valueOf(String.valueOf(productJson.get(tag)).trim());
 						if(quantity > 0){
 							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size));
+							if(sku == null){
+								continue;
+							}
 							PackingListEntry packingListEntry = new PackingListEntry();
 							packingListEntry.setEntryId(entryId);
 							packingListEntry.setStockKeepingUnit(sku);
