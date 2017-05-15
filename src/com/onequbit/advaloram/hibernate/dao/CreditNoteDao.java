@@ -20,6 +20,7 @@ import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.Invoice;
 import com.onequbit.advaloram.hibernate.entity.PackingList;
+import com.onequbit.advaloram.hibernate.dao.SalesOrderDao.Tag;
 import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.CreditNote;
 import com.onequbit.advaloram.hibernate.entity.CreditNoteEntry;
@@ -217,6 +218,7 @@ public class CreditNoteDao {
 	public static class Tag {
 		public static final String CUSTOMER_ID = "linkedCustomer", EMPLOYEE_ID = "referredByEmployee", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", COLOR_CODE = "colorCode",
 				RETURN_DATE = "returnDate",
+				PRODUCT_CATEGORY = "productCategory",
 				GENDER_CODE = "genderCode", LINKED_INVOICE_ID = "linkedInvoiceId",
 				QTY_SIZE_28 = "quantityForSize28",
 						QTY_SIZE_30 = "quantityForSize30",
@@ -274,6 +276,7 @@ public class CreditNoteDao {
 				String styleCode = productJson.getString(Tag.STYLE_CODE);
 				String colorCode = productJson.getString(Tag.COLOR_CODE);
 				String genderCode = productJson.getString(Tag.GENDER_CODE);
+				Long productCategory = Long.valueOf(String.valueOf(productJson.get(Tag.PRODUCT_CATEGORY)));
 				
 				//shortcut. dirty coding
 				for(int size = 28; size <=48; size = size+2){
@@ -286,7 +289,7 @@ public class CreditNoteDao {
 					if(!String.valueOf(productJson.get(tag)).trim().isEmpty()){
 						int quantity = Integer.valueOf(String.valueOf(productJson.get(tag)).trim());
 						if(quantity > 0){
-							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size));
+							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size), productCategory);
 							if(sku == null){
 								continue;
 							}

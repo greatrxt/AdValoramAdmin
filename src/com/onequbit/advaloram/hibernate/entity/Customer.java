@@ -141,7 +141,7 @@ public class Customer extends AbstractAdValoramEntity {
 	}
 
 	@ManyToOne(cascade = CascadeType.DETACH)
-	@JoinColumn(name="city_name", nullable = false, referencedColumnName = "city_name")
+	@JoinColumn(name="city_name", nullable = true, referencedColumnName = "city_name")
 	public Location getCity() {
 		return city;
 	}

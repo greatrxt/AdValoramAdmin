@@ -25,6 +25,7 @@ import org.hibernate.criterion.Restrictions;
 
 import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.util.HibernateUtil;
+import com.onequbit.advaloram.util.SystemUtils;
 
 @Secured
 @Provider
@@ -109,9 +110,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 				List<AdValUser> list = criteria.list();
 				if(list.size() == 1){
 					AdValUser user = list.iterator().next();
+					user.setLastUserActivityTime(SystemUtils.getFormattedDate());
 		            username = String.valueOf(user.getId());
-					return;
-				} 
+					session.update(user);
+					session.getTransaction().commit();
+				} else {
+					throw new NotAuthorizedException("Username and password combination not found");
+				}
 				
 			} catch(Exception e){
 				e.printStackTrace();
@@ -123,7 +128,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			}
 		}
 	
-		throw new NotAuthorizedException("Username and password combination not found");
+		
     }
     
 

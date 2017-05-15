@@ -32,6 +32,46 @@ public class InvoiceService {
 	final static Logger logger = Logger.getLogger(InvoiceService.class);
 	
 	@GET
+	@Path("/packingListId/invoiceStatus/{packingListInternalId}/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response invoiceStatusForPackingList(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("packingListInternalId") Long packingListInternalId){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = InvoiceDao.getInvoiceStatusForPackingList(packingListInternalId);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@GET
+	@Path("/packingListId/{packingListInternalId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getInvoiceLinkedToPackingListId(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("packingListInternalId") Long packingListInternalId){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = InvoiceDao.getInvoiceLinkedToPackingList(packingListInternalId);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAllInvoices(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext){
@@ -91,14 +131,14 @@ public class InvoiceService {
 	}
 	
 	@PUT
-	@Path("/{invoiceId}/issue")
+	@Path("/{invoiceId}/confirm")
 	@Produces(MediaType.APPLICATION_JSON)
-	public static Response issueInvoice(@Context HttpServletRequest request, 
+	public static Response confirmInvoice(@Context HttpServletRequest request, 
 			InputStream is, @Context ServletContext servletContext, @PathParam("invoiceId") Long invoiceId){
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = InvoiceDao.issueInvoice(invoiceId);
+			result = InvoiceDao.confirmInvoice(invoiceId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

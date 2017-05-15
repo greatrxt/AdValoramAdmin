@@ -20,6 +20,8 @@ import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.Employee;
 import com.onequbit.advaloram.hibernate.entity.Location;
+import com.onequbit.advaloram.hibernate.entity.PackingList;
+import com.onequbit.advaloram.hibernate.entity.PackingListEntry;
 import com.onequbit.advaloram.hibernate.entity.SalesOrder;
 import com.onequbit.advaloram.hibernate.entity.SalesOrderEntry;
 import com.onequbit.advaloram.hibernate.entity.StockKeepingUnit;
@@ -216,6 +218,7 @@ public class SalesOrderDao {
 	public static class Tag {
 		public static final String CUSTOMER_ID = "linkedCustomer", EMPLOYEE_ID = "referredByEmployee", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", COLOR_CODE = "colorCode",
 				GENDER_CODE = "genderCode",
+				PRODUCT_CATEGORY = "productCategory",
 				QTY_SIZE_28 = "quantityForSize28",
 						QTY_SIZE_30 = "quantityForSize30",
 								QTY_SIZE_32 = "quantityForSize32",
@@ -250,7 +253,8 @@ public class SalesOrderDao {
 			}
 			
 			//check if record has already been created
-			if(salesOrder.getStatus().equals(SalesOrder.Status.UNDER_REVISION)){
+			if(salesOrder.getStatus().equals(SalesOrder.Status.OPEN)
+					|| salesOrder.getStatus().equals(SalesOrder.Status.UNDER_REVISION)){
 				result.put(Application.RESULT, Application.SUCCESS);
 				result.put("objectId", salesOrder.getId());
 				result.put("salesOrderId", salesOrder.getSalesOrderId());
@@ -260,7 +264,7 @@ public class SalesOrderDao {
 			int salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber() + 1;
 			
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
-			session.beginTransaction();
+			/*session.beginTransaction();
 			
 			salesOrder.setSalesOrderRevisionNumber(salesOrderRevisionNumber);
 			salesOrder.setStatus(SalesOrder.Status.UNDER_REVISION);
@@ -268,7 +272,27 @@ public class SalesOrderDao {
 			salesOrder.setCreatedBy(session.get(AdValUser.class, userId));
 			session.save(salesOrder);
 			
-			session.getTransaction().commit();						
+			session.getTransaction().commit();*/
+			SalesOrder newSalesOrder = HibernateUtil.clone(SalesOrder.class, salesOrder);
+			newSalesOrder.setSalesOrderRevisionNumber(salesOrderRevisionNumber);
+			newSalesOrder.setStatus(SalesOrder.Status.UNDER_REVISION);
+			newSalesOrder.setId(null);
+			newSalesOrder.setRecordCreationTime(SystemUtils.getFormattedDate());	
+			newSalesOrder.setCreatedBy(session.get(AdValUser.class, userId));
+			Iterator<SalesOrderEntry> iterator = salesOrder.getEntry().iterator();
+			Set<SalesOrderEntry> newEntries = new HashSet<>();
+			while(iterator.hasNext()){
+				SalesOrderEntry entry = iterator.next();
+				SalesOrderEntry newEntry = HibernateUtil.clone(SalesOrderEntry.class, entry);
+				newEntry.setId(null);
+				newEntries.add(newEntry);
+			}
+			newSalesOrder.setEntry(newEntries);
+
+			session.beginTransaction();
+			session.save(newSalesOrder);			
+			session.getTransaction().commit();
+			
 			result.put(Application.RESULT, Application.SUCCESS);
 			result.put("objectId", salesOrder.getId());
 			result.put("salesOrderId", salesOrder.getSalesOrderId());
@@ -326,6 +350,7 @@ public class SalesOrderDao {
 				String styleCode = productJson.getString(Tag.STYLE_CODE);
 				String colorCode = productJson.getString(Tag.COLOR_CODE);
 				String genderCode = productJson.getString(Tag.GENDER_CODE);
+				Long productCategory = Long.valueOf(String.valueOf(productJson.get(Tag.PRODUCT_CATEGORY)));
 				
 				//shortcut. dirty coding
 				for(int size = 28; size <=48; size = size+2){
@@ -338,7 +363,7 @@ public class SalesOrderDao {
 					if(!String.valueOf(productJson.get(tag)).trim().isEmpty()){
 						int quantity = Integer.valueOf(String.valueOf(productJson.get(tag)).trim());
 						if(quantity > 0){
-							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size));
+							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size), productCategory);
 							if(sku == null){
 								continue;
 							}

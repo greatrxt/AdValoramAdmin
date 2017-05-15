@@ -1,5 +1,6 @@
 package com.onequbit.advaloram.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.collection.internal.PersistentMap;
+import org.hibernate.internal.util.SerializationHelper;
 import org.hibernate.service.ServiceRegistry;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,6 +51,17 @@ public class HibernateUtil {
 	public static final Integer DB_VERSION = 1;
 	//Annotation based configuration
 	private static SessionFactory sessionAnnotationFactory;
+	
+	/**
+	 * 
+	 * @param clazz
+	 * @param dtls
+	 * @return
+	 */
+	public static <T> T clone(Class<T> clazz, T dtls) { 
+        T clonedObject = (T) SerializationHelper.clone((Serializable) dtls); 
+        return clonedObject; 
+	}
 	
 	/**
 	 * Fetch all objects of particular class
@@ -130,6 +143,11 @@ public class HibernateUtil {
 					continue;
 				}
 				
+				if(entity instanceof Product 
+						&& field.getName().equals("status")){
+					continue;
+				}
+				
 				if(entity instanceof SalesOrder && (
 						field.getName().equals("salesOrderId")
 						|| field.getName().equals("linkedCustomer")
@@ -199,14 +217,14 @@ public class HibernateUtil {
 						try {
 							field.set(entity, Float.parseFloat(String.valueOf(entityObject)));
 						} catch(NumberFormatException n){
-							field.set(entity, 0);
+							field.set(entity, Float.valueOf(0));
 						}
 					} else if (field.getType().isAssignableFrom(double.class) 
 							|| field.getType().isAssignableFrom(Double.class)){
 						try {
 							field.set(entity, Double.parseDouble(String.valueOf(entityObject)));
 						} catch(NumberFormatException n){
-							field.set(entity, 0);
+							field.set(entity, Double.valueOf(0));
 						}
 					} else if (field.getType().isPrimitive()){
 						field.set(entity, entityObject);	
@@ -294,12 +312,13 @@ public class HibernateUtil {
 					continue;
 				}
 				
-				if(field.getType().isAssignableFrom(SalesOrder.Status.class)
-						||  field.getType().isAssignableFrom(PackingList.Status.class)
-						|| field.getType().isAssignableFrom(Invoice.Status.class)
-						|| field.getType().isAssignableFrom(CreditNote.Status.class)){
-					entityJson.put(field.getName(), field.get(entity));
-					continue;
+				if(field.getType().isAssignableFrom(Product.Status.class)
+					|| field.getType().isAssignableFrom(SalesOrder.Status.class)
+					||  field.getType().isAssignableFrom(PackingList.Status.class)
+					|| field.getType().isAssignableFrom(Invoice.Status.class)
+					|| field.getType().isAssignableFrom(CreditNote.Status.class)){
+						entityJson.put(field.getName(), field.get(entity));
+						continue;
 				}
 									
 				if(field.getType().isAssignableFrom(String.class) || 
@@ -309,7 +328,6 @@ public class HibernateUtil {
 						field.getType().isAssignableFrom(Double.class) ||
 						field.getType().isAssignableFrom(Float.class) ||
 						field.getType().isPrimitive()) {
-					
 						entityJson.put(field.getName(), field.get(entity));
 					
 				} else if(field.getType().isAssignableFrom(Set.class)){

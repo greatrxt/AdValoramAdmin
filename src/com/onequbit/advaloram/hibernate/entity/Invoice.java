@@ -66,7 +66,7 @@ public class Invoice extends AbstractAdValoramEntity {
 	public Double loadingCharges;
 	
 	public enum Status {
-		OPEN, ISSUED, REVISED, CANCELLED 
+		OPEN, CONFIRMED, REVISED, CANCELLED 
 	}
 	
 	@Column(name="invoice_id")

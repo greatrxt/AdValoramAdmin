@@ -34,9 +34,10 @@ public class ProductDao {
 	
 	public static class Tag {
 		public static final String STYLE_CODE = "styleCode", SEASON_CODE = "seasonCode", BRAND = "brand", PRODUCT_CATEGORY = "productCategory", UOM = "unitOfMeasurement",
-				COLORS = "colors", GENDER_CODES = "genderCodes", SIZE_CODES = "sizeCodes";
+				COLORS = "colors", GENDER_CODES = "genderCodes", SIZE_CODES = "sizeCodes", MRP = "mrp", STATUS = "status";
+		public static final String status_active = "ACTIVE", status_deactivated = "DEACTIVATED";
 		public static final class SKU {
-			public static final String EAN_CODE = "eanCode";
+			public static final String SKU_CODE = "skuCode";
 		}
 	}
 	
@@ -177,13 +178,13 @@ public class ProductDao {
 			} else {
 				product = session.get(Product.class, id);
 			}
+			
 			HibernateUtil.setDataFromJson(product, productJson);
 			
 			if(getProduct(product) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "product " + productJson.toString() + " already exists");
 			} else {
-			
 				
 				session.beginTransaction();
 				
@@ -191,6 +192,12 @@ public class ProductDao {
 				product.setBrand(session.load(Brand.class, Long.parseLong(String.valueOf(productJson.get(Tag.BRAND)))));
 				product.setProductCategory(session.load(ProductCategory.class, Long.parseLong(String.valueOf(productJson.get(Tag.PRODUCT_CATEGORY)))));
 				product.setUnitOfMeasurement(session.load(UnitOfMeasurement.class, Long.parseLong(String.valueOf(productJson.get(Tag.UOM)))));
+				
+				if(productJson.getString(Tag.STATUS).trim().equals(Tag.status_active)){
+					product.setStatus(Product.Status.ACTIVE);
+				} else if(productJson.getString(Tag.STATUS).trim().equals(Tag.status_deactivated)){
+					product.setStatus(Product.Status.DEACTIVATED);
+				}
 				
 				JSONArray colorCodesArray = productJson.getJSONArray(Tag.COLORS);
 				HashMap<ColorCode, Color> colors = new HashMap<>();
@@ -203,6 +210,7 @@ public class ProductDao {
 						colors.put(ColorCodeDao.getColorCodeUsingColorCodeName(code), ColorDao.getColorUsingColorName(colorName));
 					}
 				}
+				
 				product.setColors(colors);
 				
 				JSONArray genderArray = productJson.getJSONArray(Tag.GENDER_CODES);
@@ -283,6 +291,10 @@ public class ProductDao {
 				sizes.add(session.load(Size.class, Long.parseLong(String.valueOf(sizeArray.get(s)))));
 			}
 			
+			Integer mrp = Integer.valueOf(String.valueOf(productJson.get(Tag.MRP)));
+			Long productCategoryId = Long.parseLong(String.valueOf(productJson.get(Tag.PRODUCT_CATEGORY)));
+			
+			ProductCategory productCategory = session.load(ProductCategory.class, productCategoryId);
 			
 			Product product = session.load(Product.class, id);
 			String styleCode = productJson.getString(Tag.STYLE_CODE);
@@ -298,7 +310,7 @@ public class ProductDao {
 					Iterator<Size> sizeCodes = sizes.iterator();
 					while(sizeCodes.hasNext()){
 						Size sizeCode = sizeCodes.next();
-						StockKeepingUnit sku = new StockKeepingUnit(styleCode, colorCode, genderCode, sizeCode);
+						StockKeepingUnit sku = new StockKeepingUnit(styleCode, colorCode, genderCode, sizeCode, mrp, productCategory);
 						//StockKeepingUnit sku = new StockKeepingUnit(styleCode, colorCode.getColorCode(), genderCode.getGender(), sizeCode.getSizeCode());
 						sku.setProduct(product);
 						if(StockKeepingUnitDao.getStockKeepingUnit(sku) == null){

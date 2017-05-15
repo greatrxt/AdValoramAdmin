@@ -25,6 +25,7 @@ import org.hibernate.criterion.Restrictions;
 import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Role;
 import com.onequbit.advaloram.util.HibernateUtil;
+import com.onequbit.advaloram.util.SystemUtils;
 
 @Path("/authentication")
 public class AuthenticationEndpoint {
@@ -85,8 +86,7 @@ public class AuthenticationEndpoint {
 			AdValUser user = session.get(AdValUser.class, userId);
             user.setToken("");
             session.update(user);
-            session.getTransaction().commit();
-	 
+            session.getTransaction().commit();	 
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -116,11 +116,14 @@ public class AuthenticationEndpoint {
 				AdValUser user = list.iterator().next();
 	            // Issue a token for the user
 	            String token = issueToken(username);
+	            user.setLastLoginTime(SystemUtils.getFormattedDate());
 	            user.setToken(token);
 	            session.update(user);
 	            session.getTransaction().commit();
 				return token;
-			} 
+			} else {
+				throw new NotAuthorizedException("Username and password combination not found");
+			}
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -130,8 +133,6 @@ public class AuthenticationEndpoint {
 				session.close();
 			}
 		}
-		
-		throw new NotAuthorizedException("Username and password combination not found");
     }
 
     private String issueToken(String username) {

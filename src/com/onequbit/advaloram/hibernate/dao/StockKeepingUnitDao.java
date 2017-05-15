@@ -29,7 +29,7 @@ public class StockKeepingUnitDao {
 			session.beginTransaction();
 			
 			Criteria criteria = session.createCriteria(StockKeepingUnit.class);
-			criteria.add(Restrictions.eq(Tag.SKU.EAN_CODE, sku.getEanCode()).ignoreCase());
+			criteria.add(Restrictions.eq(Tag.SKU.SKU_CODE, sku.getSkuCode()).ignoreCase());
 
 			List<StockKeepingUnit> list = criteria.list();
 			if(list.size() > 0){
@@ -53,22 +53,22 @@ public class StockKeepingUnitDao {
 	 * @return
 	 */
 	
-	public static StockKeepingUnit getStockKeepingUnit(String styleCode, String colorCode, String genderCode, String sizeCode){
+	public static StockKeepingUnit getStockKeepingUnit(String styleCode, String colorCode, String genderCode, String sizeCode, Long productCategory){
 
 		Session session = null;
 		try {
 			
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
 			session.beginTransaction();
-			String eanCode = StockKeepingUnit.generateEanCode(colorCode, styleCode, sizeCode, genderCode);
+			String sku = StockKeepingUnit.generateSkuCode(productCategory, colorCode, styleCode, sizeCode, genderCode);
 			Criteria criteria = session.createCriteria(StockKeepingUnit.class);
-			criteria.add(Restrictions.eq(Tag.SKU.EAN_CODE, eanCode).ignoreCase());
+			criteria.add(Restrictions.eq(Tag.SKU.SKU_CODE, sku).ignoreCase());
 
 			List<StockKeepingUnit> list = criteria.list();
 			if(list.size() > 0){
 				if(list.size()!=1){
 					//something is wrong
-					throw new Exception("ERROR - More than entry for EAN Code " + eanCode + " found");
+					throw new Exception("ERROR - More than entry for EAN Code " + sku + " found");
 				}
 				return list.iterator().next();
 			} 

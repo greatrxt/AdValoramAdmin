@@ -13,14 +13,19 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import com.onequbit.advaloram.hibernate.entity.SalesOrder.Status;
+
 
 //https://www.mkyong.com/hibernate/hibernate-many-to-many-relationship-example-annotation/
 @Entity
-@Table(name = "product")
+@Table(name = "product",
+	uniqueConstraints = {@UniqueConstraint(columnNames = {"style_code", "product_category"})}
+)
 public class Product extends AbstractAdValoramEntity {
 
 	/**
@@ -44,7 +49,11 @@ public class Product extends AbstractAdValoramEntity {
 	public Integer tradePrice;
 	public Integer costPrice;
 	//public String productName;
-	public String status;
+	public Status status;
+	
+	public static enum Status {
+		ACTIVE, DEACTIVATED
+	}
 	
 	public Set<StockKeepingUnit> stockKeepingUnits;
 	
@@ -85,7 +94,7 @@ public class Product extends AbstractAdValoramEntity {
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@Fetch (FetchMode.SELECT)
-	@JoinColumn(name="category_name", nullable = true, referencedColumnName = "category_name")
+	@JoinColumn(name="product_category", nullable = true, referencedColumnName = "category_name")
 	public ProductCategory getProductCategory() {
 		return productCategory;
 	}
@@ -126,7 +135,7 @@ public class Product extends AbstractAdValoramEntity {
 	}*/
 	
 	@Column(name="status")
-	public String getStatus() {
+	public Status getStatus() {
 		return status;
 	}
 	
@@ -143,7 +152,7 @@ public class Product extends AbstractAdValoramEntity {
 	}
 
 
-	@Column(name="style_code", unique = true)
+	@Column(name="style_code")
 	public String getStyleCode() {
 		return styleCode;
 	}
@@ -199,7 +208,7 @@ public class Product extends AbstractAdValoramEntity {
 	/*public void setProductName(String productName) {
 		this.productName = productName;
 	}*/
-	public void setStatus(String status) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 

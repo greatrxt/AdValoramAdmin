@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
+import com.onequbit.advaloram.hibernate.dao.SalesOrderDao.Tag;
 import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Customer;
 import com.onequbit.advaloram.hibernate.entity.PackingList;
@@ -312,6 +313,7 @@ public class PackingListDao {
 		public static final String CUSTOMER_ID = "linkedCustomer", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", LINKED_SALES_ORDER_INTERNAL_ID = "linkedSalesOrderInternalId",
 				LINKED_SALES_ORDER_ID = "linkedSalesOrderId",
 				GENDER_CODE = "genderCode", COLOR_CODE = "colorCode",
+				PRODUCT_CATEGORY = "productCategory",
 				QTY_SIZE_28 = "quantityForSize28",
 						QTY_SIZE_30 = "quantityForSize30",
 								QTY_SIZE_32 = "quantityForSize32",
@@ -344,7 +346,8 @@ public class PackingListDao {
 			}
 			
 			//check if record has already been created
-			if(packingList.getStatus().equals(PackingList.Status.UNDER_REVISION)){
+			if(packingList.getStatus().equals(PackingList.Status.UNDER_REVISION)
+					|| packingList.getStatus().equals(PackingList.Status.OPEN)){
 				result.put(Application.RESULT, Application.SUCCESS);
 				result.put("objectId", packingList.getId());
 				result.put("packingListId", packingList.getPackingListId());
@@ -353,22 +356,57 @@ public class PackingListDao {
 			
 			int packingListRevisionNumber = packingList.getPackingListRevisionNumber() + 1;
 			
-			session = HibernateUtil.getSessionAnnotationFactory().openSession();
-			session.beginTransaction();
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();			
+			/*//experimental
+			session.evict(packingList);
+			packingList.setId(null);
+			Iterator<PackingListEntry> iterator = packingList.getEntry().iterator();
+			while(iterator.hasNext()){
+				PackingListEntry entry = iterator.next();
+				session.evict(entry);
+				entry.setId(null);
+				session.save(entry);
+			}
+			//end
 			
 			packingList.setPackingListRevisionNumber(packingListRevisionNumber);
 			packingList.setStatus(PackingList.Status.UNDER_REVISION);
 			packingList.setRecordCreationTime(SystemUtils.getFormattedDate());	
 			packingList.setCreatedBy(session.get(AdValUser.class, userId));
-			session.save(packingList);
 			
-			session.getTransaction().commit();						
+			session.beginTransaction();
+			session.save(packingList);			
+			session.getTransaction().commit();
+			*/
+			PackingList newPackingList = HibernateUtil.clone(PackingList.class, packingList);
+			newPackingList.setPackingListRevisionNumber(packingListRevisionNumber);
+			newPackingList.setStatus(PackingList.Status.UNDER_REVISION);
+			newPackingList.setId(null);
+			newPackingList.setRecordCreationTime(SystemUtils.getFormattedDate());	
+			newPackingList.setCreatedBy(session.get(AdValUser.class, userId));
+			Iterator<PackingListEntry> iterator = packingList.getEntry().iterator();
+			Set<PackingListEntry> newEntries = new HashSet<>();
+			while(iterator.hasNext()){
+				PackingListEntry entry = iterator.next();
+				PackingListEntry newEntry = HibernateUtil.clone(PackingListEntry.class, entry);
+				newEntry.setId(null);
+				newEntries.add(newEntry);
+			}
+			newPackingList.setEntry(newEntries);
+			session.beginTransaction();
+			session.save(newPackingList);			
+			session.getTransaction().commit();
+			
 			result.put(Application.RESULT, Application.SUCCESS);
-			result.put("objectId", packingList.getId());
-			result.put("packingListId", packingList.getPackingListId());
+			result.put("objectId", newPackingList.getId());
+			result.put("packingListId", newPackingList.getPackingListId());
 		} catch(Exception e){
 			e.printStackTrace();
 			result = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
 		}
 		
 		return result;
@@ -405,7 +443,7 @@ public class PackingListDao {
 				
 			} else {
 				packingList = new PackingList();
-				packingList.setStatus(packingList.status.OPEN);
+				packingList.setStatus(PackingList.Status.OPEN);
 				packingList.setPackingListId(getNextPackingListIdAsLong());
 				packingList.setPackingListDate(SystemUtils.getFormattedDate());
 			}			
@@ -421,7 +459,7 @@ public class PackingListDao {
 				String styleCode = productJson.getString(Tag.STYLE_CODE);
 				String colorCode = productJson.getString(Tag.COLOR_CODE);
 				String genderCode = productJson.getString(Tag.GENDER_CODE);
-				
+				Long productCategory = Long.valueOf(String.valueOf(productJson.get(Tag.PRODUCT_CATEGORY)));
 				//shortcut. dirty coding
 				for(int size = 28; size <=48; size = size+2){
 					String prefix = "quantityForSize";
@@ -433,7 +471,7 @@ public class PackingListDao {
 					if(!String.valueOf(productJson.get(tag)).trim().isEmpty()){
 						int quantity = Integer.valueOf(String.valueOf(productJson.get(tag)).trim());
 						if(quantity > 0){
-							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size));
+							StockKeepingUnit sku = StockKeepingUnitDao.getStockKeepingUnit(styleCode, colorCode, genderCode, String.valueOf(size), productCategory);
 							if(sku == null){
 								continue;
 							}

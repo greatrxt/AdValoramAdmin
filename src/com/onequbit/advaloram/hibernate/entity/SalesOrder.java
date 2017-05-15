@@ -64,6 +64,8 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	
 	public Employee referredByEmployee;
 	
+	public Customer referredByCustomer;
+	
 	public Set<SalesOrderEntry> entry;
 	
 	public float markDownOnSalesOrderDate;
@@ -258,6 +260,16 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	public float getOctroiLbtEntryTaxApplicableOnSalesOrderDate() {
 		return octroiLbtEntryTaxApplicableOnSalesOrderDate;
 	}*/
+
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name="referred_by_customer", nullable = true, referencedColumnName = "id")
+	public Customer getReferredByCustomer() {
+		return referredByCustomer;
+	}
+
+	public void setReferredByCustomer(Customer referredByCustomer) {
+		this.referredByCustomer = referredByCustomer;
+	}
 
 	public void setId(long id) {
 		this.id = id;

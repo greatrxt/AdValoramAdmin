@@ -328,11 +328,11 @@ public class InvoiceDao {
 	}
 
 	/**
-	 * Change status of Sales Order to CONFIRM
+	 * Change status of Invoice to CONFIRM
 	 * @param invoiceId
 	 * @return
 	 */
-	public static JSONObject issueInvoice(Long invoiceId) {
+	public static JSONObject confirmInvoice(Long invoiceId) {
 		
 		Session session = null;		
 		JSONObject resultsJson = new JSONObject();
@@ -349,7 +349,7 @@ public class InvoiceDao {
 				Iterator<Invoice> invoiceIterator = list.iterator();
 				while(invoiceIterator.hasNext()){
 					Invoice invoice = invoiceIterator.next();
-					invoice.setStatus(Status.ISSUED);
+					invoice.setStatus(Status.CONFIRMED);
 					session.update(invoice);
 				}
 				session.getTransaction().commit();
@@ -389,6 +389,87 @@ public class InvoiceDao {
 			JSONObject invoiceJson = HibernateUtil.getJsonFromHibernateEntity(invoice);
 			resultArray.put(invoiceJson);
 			resultsJson.put(Application.RESULT, resultArray);
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+
+	/**
+	 * Get invoice linked to a particular packing list
+	 * @param packingListInternalId
+	 * @return
+	 */
+	public static JSONObject getInvoiceStatusForPackingList(Long packingListInternalId) {
+		JSONObject resultsJson = new JSONObject();
+		resultsJson.put(Application.RESULT, false);	//default - false
+		Session session = null;
+		try {
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(Invoice.class);
+			criteria.add(Restrictions.eq("linkedPackingList", session.load(PackingList.class, packingListInternalId)));
+			
+			List<Invoice> invoicesList = criteria.list();
+			
+			if(invoicesList.size() > 0){
+				resultsJson.put(Application.RESULT, true);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+
+	/**
+	 * Get invoice linked to a particular packing list
+	 * @param packingListInternalId
+	 * @return
+	 */
+	public static JSONObject getInvoiceLinkedToPackingList(Long packingListInternalId) {
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {
+			
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();
+			
+			Criteria criteria = session.createCriteria(Invoice.class);
+			criteria.add(Restrictions.eq("linkedPackingList", session.load(PackingList.class, packingListInternalId)));
+			
+			List<Invoice> invoicesList = criteria.list();
+			
+			if(invoicesList.size() == 0){
+				//No Invoice found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No Invoice linked to packingListId '" + packingListInternalId + "' found");
+			} else {
+				Iterator<Invoice> iterator = invoicesList.iterator();
+				while(iterator.hasNext()){
+					Invoice invoice = iterator.next();
+					JSONObject invoiceJson = HibernateUtil.getJsonFromHibernateEntity(invoice);
+					resultArray.put(invoiceJson);
+				}
+				
+				resultsJson.put(Application.RESULT, resultArray);
+			}
 			
 		} catch(Exception e){
 			e.printStackTrace();
