@@ -151,8 +151,10 @@ public class HibernateUtil {
 				if(entity instanceof SalesOrder && (
 						field.getName().equals("salesOrderId")
 						|| field.getName().equals("linkedCustomer")
-						//|| field.getName().equals("clientNameOnSalesOrderDate")
+						|| field.getName().equals("referredByCustomer")
 						|| field.getName().equals("referredByEmployee")
+						|| field.getName().equals("referredByCustomer")
+						|| field.getName().equals("refereePartner")
 						|| field.getName().equals("entry")
 						|| field.getName().equals("status")
 						|| field.getName().equals("salesOrderRevisionNumber")
@@ -226,7 +228,8 @@ public class HibernateUtil {
 						} catch(NumberFormatException n){
 							field.set(entity, Double.valueOf(0));
 						}
-					} else if (field.getType().isPrimitive()){
+					} else if (field.getType().isPrimitive()
+							|| field.getType().isAssignableFrom(Boolean.class)){
 						field.set(entity, entityObject);	
 					} else if (field.getType().isAssignableFrom(Map.class)){
 						
@@ -327,6 +330,7 @@ public class HibernateUtil {
 						field.getType().isAssignableFrom(Integer.class) ||
 						field.getType().isAssignableFrom(Double.class) ||
 						field.getType().isAssignableFrom(Float.class) ||
+						field.getType().isAssignableFrom(Boolean.class) ||
 						field.getType().isPrimitive()) {
 						entityJson.put(field.getName(), field.get(entity));
 					

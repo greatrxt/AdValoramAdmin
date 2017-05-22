@@ -139,6 +139,28 @@ public class CustomerDao {
 	}
 	
 	/**
+	 * Get all customers count
+	 * @return
+	 */
+	public static JSONObject getAllCustomersCount(){
+		JSONObject resultsJson = new JSONObject();
+		Session session = null;
+		try {					
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			long customerCount = (long) session.createCriteria(Customer.class).setProjection(Projections.rowCount()).uniqueResult();
+			resultsJson.put(Application.RESULT, customerCount);
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+	/**
 	 * Get all Customers of type
 	 * @return
 	 */

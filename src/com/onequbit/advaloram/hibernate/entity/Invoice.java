@@ -14,7 +14,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(
 		name = "invoice", 
-		uniqueConstraints = {@UniqueConstraint(columnNames = {"linked_sales_order", "linked_packing_list"})}	//implies that combination of salesOrder and packing list mut be unique. 
+		uniqueConstraints = {@UniqueConstraint(columnNames = {"linked_sales_order", "linked_packing_list", "invoice_revision_number"})}	//implies that combination of salesOrder and packing list mut be unique. 
 		)
 public class Invoice extends AbstractAdValoramEntity {
 
@@ -66,7 +66,7 @@ public class Invoice extends AbstractAdValoramEntity {
 	public Double loadingCharges;
 	
 	public enum Status {
-		OPEN, CONFIRMED, REVISED, CANCELLED 
+		OPEN, CONFIRMED, REVISED, CANCELLED, UNDER_REVISION
 	}
 	
 	@Column(name="invoice_id")

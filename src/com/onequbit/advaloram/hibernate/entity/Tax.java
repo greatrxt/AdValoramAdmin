@@ -17,7 +17,7 @@ public class Tax extends AbstractAdValoramEntity {
 	public String shortName;
 	public double taxRate;
 	
-	@Column(name="tax_name")
+	@Column(name="tax_name", nullable = false)
 	public String getTaxName() {
 		return taxName;
 	}
@@ -25,14 +25,14 @@ public class Tax extends AbstractAdValoramEntity {
 		this.taxName = taxName;
 	}
 	
-	@Column(name="short_name")
+	@Column(name="short_name", nullable = false)
 	public String getShortName() {
 		return shortName;
 	}
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
-	@Column(name="tax_rate")
+	@Column(name="tax_rate", nullable = false)
 	public double getTaxRate() {
 		return taxRate;
 	}

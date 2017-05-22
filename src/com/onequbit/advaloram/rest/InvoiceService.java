@@ -91,6 +91,47 @@ public class InvoiceService {
 	}
 	
 	@GET
+	@Path("/monthlySales")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getMonthlySales(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = InvoiceDao.getMonthlySales();
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	
+	@GET
+	@Path("/open/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getOpenInvoicesCount(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = InvoiceDao.getOpenInvoicesCount();
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@GET
 	@Path("/{invoiceId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getInvoiceUsingId(@Context HttpServletRequest request, 
@@ -119,6 +160,30 @@ public class InvoiceService {
 		try {
 			result = new JSONObject();
 			result = InvoiceDao.getInvoiceJsonUsingInternalId(internalId);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@PUT
+	@Path("/{invoiceId}/edit")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response editInvoice(@Context HttpServletRequest request, 
+			@Context ServletContext servletContext, @PathParam("invoiceId") Long invoiceId, @Context SecurityContext securityContext){
+		
+		JSONObject result;
+		try {
+			Principal principal = securityContext.getUserPrincipal();
+			Long userId = Long.valueOf(principal.getName());
+			
+			result = new JSONObject();
+			result = InvoiceDao.createNewRevisionOfInvoice(invoiceId, userId);
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);
@@ -232,6 +297,41 @@ public class InvoiceService {
 		try {
 			result = new JSONObject();
 			result = InvoiceDao.createOrUpdateInvoice(id, inputStreamArray, (long) -1);	//not saving. So no userId required
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@PUT
+	@Path("/{id}/lrNo")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response addLrNumberToInvoice(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("id") Long id){
+		
+		JSONObject inputStreamArray = SystemUtils.convertInputStreamToJSON(is);
+		logger.info("\n\n\n\nReceived Request to add LR Number to invoice. Incoming JSON : " +inputStreamArray);		
+		
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			if(inputStreamArray.has("lorryReceiptNumber")){
+				if(!inputStreamArray.getString("lorryReceiptNumber").trim().isEmpty()){
+					String lrNo = inputStreamArray.getString("lorryReceiptNumber").trim();
+					result = InvoiceDao.addLrNumberToInvoice(id, lrNo);
+					return Response.status(Response.Status.OK).entity(result.toString()).build();
+				}
+			} 
+				
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, "Invalid Lorry Receipt Number");		
+			
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

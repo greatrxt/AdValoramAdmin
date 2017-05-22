@@ -215,8 +215,54 @@ public class SalesOrderDao {
 		return resultsJson;
 	}
 	
+	/**
+	 * Get all SalesOrders
+	 * @return
+	 */
+	public static JSONObject getOpenSalesOrdersCount(){
+		JSONObject resultsJson = new JSONObject();
+		Session session = null;
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();		
+			
+			
+			Criteria criteria = 
+				    session.createCriteria(SalesOrder.class)
+				           .setProjection(Projections.distinct(Projections.property("salesOrderId")));
+			
+			List<Long> salesOrdersIdList = criteria.list();
+			
+			if(salesOrdersIdList.size() == 0){
+				//No SalesOrder found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No SalesOrder found");
+			} else {
+				int openSalesOrderCount = 0;
+				Iterator<Long> iterator = salesOrdersIdList.iterator();
+				while(iterator.hasNext()){
+					SalesOrder salesOrder = getSalesOrderLatestRevision(iterator.next());
+					if(salesOrder.getStatus().equals(SalesOrder.Status.OPEN)){
+						openSalesOrderCount++;
+					}
+				}
+				resultsJson.put(Application.RESULT, openSalesOrderCount);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+	
 	public static class Tag {
-		public static final String CUSTOMER_ID = "linkedCustomer", EMPLOYEE_ID = "referredByEmployee", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", COLOR_CODE = "colorCode",
+		public static final String REFERRED_BY_CUSTOMER = "referredByCustomer", REFEREE_PARTNER = "refereePartner", CUSTOMER_ID = "linkedCustomer", EMPLOYEE_ID = "referredByEmployee", PRODUCT_LIST = "productList", STYLE_CODE = "styleCode", COLOR_CODE = "colorCode",
 				GENDER_CODE = "genderCode",
 				PRODUCT_CATEGORY = "productCategory",
 				QTY_SIZE_28 = "quantityForSize28",
@@ -264,15 +310,6 @@ public class SalesOrderDao {
 			int salesOrderRevisionNumber = salesOrder.getSalesOrderRevisionNumber() + 1;
 			
 			session = HibernateUtil.getSessionAnnotationFactory().openSession();
-			/*session.beginTransaction();
-			
-			salesOrder.setSalesOrderRevisionNumber(salesOrderRevisionNumber);
-			salesOrder.setStatus(SalesOrder.Status.UNDER_REVISION);
-			salesOrder.setRecordCreationTime(SystemUtils.getFormattedDate());	
-			salesOrder.setCreatedBy(session.get(AdValUser.class, userId));
-			session.save(salesOrder);
-			
-			session.getTransaction().commit();*/
 			SalesOrder newSalesOrder = HibernateUtil.clone(SalesOrder.class, salesOrder);
 			newSalesOrder.setSalesOrderRevisionNumber(salesOrderRevisionNumber);
 			newSalesOrder.setStatus(SalesOrder.Status.UNDER_REVISION);
@@ -383,6 +420,16 @@ public class SalesOrderDao {
 			if(salesOrderJson.has(Tag.CUSTOMER_ID)){
 				if(!String.valueOf(salesOrderJson.get(Tag.CUSTOMER_ID)).trim().isEmpty())
 					salesOrder.setLinkedCustomer(session.load(Customer.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.CUSTOMER_ID)))));
+			}
+			
+			if(salesOrderJson.has(Tag.REFERRED_BY_CUSTOMER)){
+				if(!String.valueOf(salesOrderJson.get(Tag.REFERRED_BY_CUSTOMER)).trim().isEmpty())
+					salesOrder.setReferredByCustomer(session.load(Customer.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.REFERRED_BY_CUSTOMER)))));
+			}
+			
+			if(salesOrderJson.has(Tag.REFEREE_PARTNER)){
+				if(!String.valueOf(salesOrderJson.get(Tag.REFEREE_PARTNER)).trim().isEmpty())
+					salesOrder.setRefereePartner(session.load(Customer.class, Long.parseLong(String.valueOf(salesOrderJson.get(Tag.REFEREE_PARTNER)))));
 			}
 			if(salesOrderJson.has(Tag.EMPLOYEE_ID)){
 				if(!String.valueOf(salesOrderJson.get(Tag.EMPLOYEE_ID)).trim().isEmpty())

@@ -35,8 +35,10 @@ public class SystemUtils {
 		JSONObject error = new JSONObject();
 		error.put(Application.RESULT, Application.ERROR);
 		error.put(Application.ERROR_MESSAGE, e.getMessage());
-		error.put("ClassName", e.getStackTrace()[0].getClassName());
-		error.put("LineNumber", e.getStackTrace()[0].getLineNumber());
+		error.put("OriginClassName", e.getStackTrace()[0].getClassName());
+		error.put("OriginClassLineNumber", e.getStackTrace()[0].getLineNumber());
+		error.put("FinalClassName", e.getStackTrace()[e.getStackTrace().length - 1].getClassName());
+		error.put("FinalClassLineNumber", e.getStackTrace()[e.getStackTrace().length - 1].getLineNumber());
 		return error;
 	}
 	

@@ -54,6 +54,7 @@ public class Customer extends AbstractAdValoramEntity {
 	
 	public String financialGrouping;
 	public String vatTinNumber;
+	public String gstNumber;
 	public String cstTinNumber;
 	public String serviceTaxNumber;
 	public String panNumber;
@@ -324,6 +325,15 @@ public class Customer extends AbstractAdValoramEntity {
 
 	public void setVatTinNumber(String vatTinNumber) {
 		this.vatTinNumber = vatTinNumber;
+	}
+
+	@Column(name="gst_number")
+	public String getGstNumber() {
+		return gstNumber;
+	}
+
+	public void setGstNumber(String gstNumber) {
+		this.gstNumber = gstNumber;
 	}
 
 	@Column(name="cst_tin_number")

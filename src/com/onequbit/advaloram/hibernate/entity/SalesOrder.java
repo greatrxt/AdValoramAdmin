@@ -66,21 +66,28 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	
 	public Customer referredByCustomer;
 	
+	public Customer refereePartner;
+	
 	public Set<SalesOrderEntry> entry;
 	
-	public float markDownOnSalesOrderDate;
+	public Double markDownOnSalesOrderDate;
 	
-	public float cashDiscountOnSalesOrderDate;
+	public Double cashDiscountOnSalesOrderDate;
 	
-	public float promptPaymentDiscountOnSalesOrderDate;
+	public Double promptPaymentDiscountOnSalesOrderDate;
 	
-	public float specialDiscountOnSalesOrderDate;
+	public Double specialDiscountOnSalesOrderDate;
 	
-/*	public float cstRateApplicableOnSalesOrderDate;
-	public float vatRateApplicableOnSalesOrderDate;
-	public float cstRateAgainstFormCOnSalesOrderDate;
-	public float gstRateApplicableOnSalesOrderDate;
-	public float octroiLbtEntryTaxApplicableOnSalesOrderDate;*/
+	public Double cstRateApplicableOnSalesOrderDate;
+	public Double vatRateApplicableOnSalesOrderDate;
+	public Double cstRateAgainstFormCOnSalesOrderDate;
+	public Double gstRateApplicableOnSalesOrderDate;
+	public Double octroiLbtEntryTaxApplicableOnSalesOrderDate;
+	
+	public Boolean vatIsApplicableOnSalesOrderDate;
+	public Boolean cstIsApplicableOnSalesOrderDate;
+	public Boolean gstIsApplicableOnSalesOrderDate;
+	public Boolean octroiLbtEntryTaxIsApplicableOnSalesOrderDate;
 	
 	public String notes;
 	
@@ -190,22 +197,22 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	}
 
 	@Column(name="mark_down_on_sales_order_date")
-	public float getMarkDownOnSalesOrderDate() {
+	public Double getMarkDownOnSalesOrderDate() {
 		return markDownOnSalesOrderDate;
 	}
 
 	@Column(name="cash_discount_on_sales_order_date")
-	public float getCashDiscountOnSalesOrderDate() {
+	public Double getCashDiscountOnSalesOrderDate() {
 		return cashDiscountOnSalesOrderDate;
 	}
 
 	@Column(name="prompt_payment_discount_on_sales_order_date")
-	public float getPromptPaymentDiscountOnSalesOrderDate() {
+	public Double getPromptPaymentDiscountOnSalesOrderDate() {
 		return promptPaymentDiscountOnSalesOrderDate;
 	}
 
 	@Column(name="special_discount_on_sales_order_date")
-	public float getSpecialDiscountOnSalesOrderDate() {
+	public Double getSpecialDiscountOnSalesOrderDate() {
 		return specialDiscountOnSalesOrderDate;
 	}
 
@@ -233,38 +240,83 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	}
 	
 
-	/*@Column(name="cst_rate_applicable")
-	public float getCstRateApplicableOnSalesOrderDate() {
+	@Column(name="cst_rate_applicable_on_sales_order_date")
+	public Double getCstRateApplicableOnSalesOrderDate() {
 		return cstRateApplicableOnSalesOrderDate;
 	}
 
-
-
 	@Column(name="vat_rate_applicable_on_sales_order_date")
-	public float getVatRateApplicableOnSalesOrderDate() {
+	public Double getVatRateApplicableOnSalesOrderDate() {
 		return vatRateApplicableOnSalesOrderDate;
 	}
 
 
 	@Column(name="cst_rate_against_form_c_on_sales_order_date")
-	public float getCstRateAgainstFormCOnSalesOrderDate() {
+	public Double getCstRateAgainstFormCOnSalesOrderDate() {
 		return cstRateAgainstFormCOnSalesOrderDate;
 	}
 
 	@Column(name="gst_rate_applicable_on_sales_order_date")
-	public float getGstRateApplicableOnSalesOrderDate() {
+	public Double getGstRateApplicableOnSalesOrderDate() {
 		return gstRateApplicableOnSalesOrderDate;
 	}
 
 	@Column(name="octroi_lbt_entry_tax_applicable_on_sales_order_date")
-	public float getOctroiLbtEntryTaxApplicableOnSalesOrderDate() {
+	public Double getOctroiLbtEntryTaxApplicableOnSalesOrderDate() {
 		return octroiLbtEntryTaxApplicableOnSalesOrderDate;
-	}*/
+	}
 
 	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="referred_by_customer", nullable = true, referencedColumnName = "id")
 	public Customer getReferredByCustomer() {
 		return referredByCustomer;
+	}
+
+	@Column(name="is_vat_applicable_on_sales_order_date")
+	public Boolean getVatIsApplicableOnSalesOrderDate() {
+		return vatIsApplicableOnSalesOrderDate;
+	}
+
+	@Column(name="is_cst_applicable_on_sales_order_date")
+	public Boolean getCstIsApplicableOnSalesOrderDate() {
+		return cstIsApplicableOnSalesOrderDate;
+	}
+
+	@Column(name="is_gst_applicable_on_sales_order_date")
+	public Boolean getGstIsApplicableOnSalesOrderDate() {
+		return gstIsApplicableOnSalesOrderDate;
+	}
+
+	@Column(name="is_octroi_lbt_entry_tax_applicable_on_sales_order_date")
+	public Boolean getOctroiLbtEntryTaxIsApplicableOnSalesOrderDate() {
+		return octroiLbtEntryTaxIsApplicableOnSalesOrderDate;
+	}
+
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name="referee_partner", nullable = true, referencedColumnName = "id")
+	public Customer getRefereePartner() {
+		return refereePartner;
+	}
+
+	
+	public void setRefereePartner(Customer refereePartner) {
+		this.refereePartner = refereePartner;
+	}
+
+	public void setVatIsApplicableOnSalesOrderDate(Boolean vatIsApplicableOnSalesOrderDate) {
+		this.vatIsApplicableOnSalesOrderDate = vatIsApplicableOnSalesOrderDate;
+	}
+
+	public void setCstIsApplicableOnSalesOrderDate(Boolean cstIsApplicableOnSalesOrderDate) {
+		this.cstIsApplicableOnSalesOrderDate = cstIsApplicableOnSalesOrderDate;
+	}
+
+	public void setGstIsApplicableOnSalesOrderDate(Boolean gstIsApplicableOnSalesOrderDate) {
+		this.gstIsApplicableOnSalesOrderDate = gstIsApplicableOnSalesOrderDate;
+	}
+
+	public void setOctroiLbtEntryTaxIsApplicableOnSalesOrderDate(Boolean octroiLbtEntryTaxIsApplicableOnSalesOrderDate) {
+		this.octroiLbtEntryTaxIsApplicableOnSalesOrderDate = octroiLbtEntryTaxIsApplicableOnSalesOrderDate;
 	}
 
 	public void setReferredByCustomer(Customer referredByCustomer) {
@@ -352,39 +404,39 @@ public class SalesOrder extends AbstractAdValoramEntity {
 		this.entry = entry;
 	}
 
-/*	public void setOctroiLbtEntryTaxApplicableOnSalesOrderDate(float octroiLbtEntryTaxApplicableOnSalesOrderDate) {
+	public void setOctroiLbtEntryTaxApplicableOnSalesOrderDate(Double octroiLbtEntryTaxApplicableOnSalesOrderDate) {
 		this.octroiLbtEntryTaxApplicableOnSalesOrderDate = octroiLbtEntryTaxApplicableOnSalesOrderDate;
 	}
 
-	public void setGstRateApplicableOnSalesOrderDate(float gstRateApplicableOnSalesOrderDate) {
+	public void setGstRateApplicableOnSalesOrderDate(Double gstRateApplicableOnSalesOrderDate) {
 		this.gstRateApplicableOnSalesOrderDate = gstRateApplicableOnSalesOrderDate;
 	}
 
-	public void setCstRateAgainstFormCOnSalesOrderDate(float cstRateAgainstFormCOnSalesOrderDate) {
+	public void setCstRateAgainstFormCOnSalesOrderDate(Double cstRateAgainstFormCOnSalesOrderDate) {
 		this.cstRateAgainstFormCOnSalesOrderDate = cstRateAgainstFormCOnSalesOrderDate;
 	}
 	
-	public void setVatRateApplicableOnSalesOrderDate(float vatRateApplicableOnSalesOrderDate) {
+	public void setVatRateApplicableOnSalesOrderDate(Double vatRateApplicableOnSalesOrderDate) {
 		this.vatRateApplicableOnSalesOrderDate = vatRateApplicableOnSalesOrderDate;
 	}
 	
-	public void setCstRateApplicableOnSalesOrderDate(float cstRateApplicableOnSalesOrderDate) {
+	public void setCstRateApplicableOnSalesOrderDate(Double cstRateApplicableOnSalesOrderDate) {
 		this.cstRateApplicableOnSalesOrderDate = cstRateApplicableOnSalesOrderDate;
-	}*/
+	}
 	
-	public void setMarkDownOnSalesOrderDate(float markDownOnSalesOrderDate) {
+	public void setMarkDownOnSalesOrderDate(Double markDownOnSalesOrderDate) {
 		this.markDownOnSalesOrderDate = markDownOnSalesOrderDate;
 	}
 
-	public void setCashDiscountOnSalesOrderDate(float cashDiscountOnSalesOrderDate) {
+	public void setCashDiscountOnSalesOrderDate(Double cashDiscountOnSalesOrderDate) {
 		this.cashDiscountOnSalesOrderDate = cashDiscountOnSalesOrderDate;
 	}
 
-	public void setPromptPaymentDiscountOnSalesOrderDate(float promptPaymentDiscountOnSalesOrderDate) {
+	public void setPromptPaymentDiscountOnSalesOrderDate(Double promptPaymentDiscountOnSalesOrderDate) {
 		this.promptPaymentDiscountOnSalesOrderDate = promptPaymentDiscountOnSalesOrderDate;
 	}
 
-	public void setSpecialDiscountOnSalesOrderDate(float specialDiscountOnSalesOrderDate) {
+	public void setSpecialDiscountOnSalesOrderDate(Double specialDiscountOnSalesOrderDate) {
 		this.specialDiscountOnSalesOrderDate = specialDiscountOnSalesOrderDate;
 	}
 
