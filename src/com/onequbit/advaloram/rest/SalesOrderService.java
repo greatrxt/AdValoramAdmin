@@ -2,7 +2,6 @@ package com.onequbit.advaloram.rest;
 
 import java.io.InputStream;
 import java.security.Principal;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 

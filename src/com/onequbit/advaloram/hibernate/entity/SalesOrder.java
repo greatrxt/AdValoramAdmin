@@ -23,7 +23,7 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "sales_order")
-public class SalesOrder extends AbstractAdValoramEntity {
+public class SalesOrder extends AbstractAdValoramEntity implements Comparable<SalesOrder>{
 
 	/**
 	 * 
@@ -88,6 +88,12 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	public Boolean cstIsApplicableOnSalesOrderDate;
 	public Boolean gstIsApplicableOnSalesOrderDate;
 	public Boolean octroiLbtEntryTaxIsApplicableOnSalesOrderDate;
+	
+	public String vatTinNumberOnSalesOrderDate;
+	public String gstNumberOnSalesOrderDate;
+	public String cstTinNumberOnSalesOrderDate;
+	public String serviceTaxNumberOnSalesOrderDate;
+	public String panNumberOnSalesOrderDate;
 	
 	public String notes;
 	
@@ -299,6 +305,52 @@ public class SalesOrder extends AbstractAdValoramEntity {
 	}
 
 	
+	@Column(name="client_vat_tin_number_on_sales_order_date")
+	public String getVatTinNumberOnSalesOrderDate() {
+		return vatTinNumberOnSalesOrderDate;
+	}
+
+	@Column(name="client_gst_number_on_sales_order_date")
+	public String getGstNumberOnSalesOrderDate() {
+		return gstNumberOnSalesOrderDate;
+	}
+
+	@Column(name="client_cst_tin_number_on_sales_order_date")
+	public String getCstTinNumberOnSalesOrderDate() {
+		return cstTinNumberOnSalesOrderDate;
+	}
+
+	@Column(name="client_service_tax_number_on_sales_order_date")
+	public String getServiceTaxNumberOnSalesOrderDate() {
+		return serviceTaxNumberOnSalesOrderDate;
+	}
+
+	@Column(name="client_pan_number_on_sales_order_date")
+	public String getPanNumberOnSalesOrderDate() {
+		return panNumberOnSalesOrderDate;
+	}
+
+	
+	public void setVatTinNumberOnSalesOrderDate(String vatTinNumberOnSalesOrderDate) {
+		this.vatTinNumberOnSalesOrderDate = vatTinNumberOnSalesOrderDate;
+	}
+
+	public void setGstNumberOnSalesOrderDate(String gstNumberOnSalesOrderDate) {
+		this.gstNumberOnSalesOrderDate = gstNumberOnSalesOrderDate;
+	}
+
+	public void setCstTinNumberOnSalesOrderDate(String cstTinNumberOnSalesOrderDate) {
+		this.cstTinNumberOnSalesOrderDate = cstTinNumberOnSalesOrderDate;
+	}
+
+	public void setServiceTaxNumberOnSalesOrderDate(String serviceTaxNumberOnSalesOrderDate) {
+		this.serviceTaxNumberOnSalesOrderDate = serviceTaxNumberOnSalesOrderDate;
+	}
+
+	public void setPanNumberOnSalesOrderDate(String panNumberOnSalesOrderDate) {
+		this.panNumberOnSalesOrderDate = panNumberOnSalesOrderDate;
+	}
+
 	public void setRefereePartner(Customer refereePartner) {
 		this.refereePartner = refereePartner;
 	}
@@ -446,5 +498,16 @@ public class SalesOrder extends AbstractAdValoramEntity {
 
 	public void setAssociatedFiles(Set<File> associatedFiles) {
 		this.associatedFiles = associatedFiles;
+	}
+
+	@Override
+	public int compareTo(SalesOrder salesOrder) {
+		long compareQuantity = ((SalesOrder) salesOrder).getSalesOrderId();
+
+		//ascending order
+		return (int) (this.salesOrderId - compareQuantity);
+
+		//descending order
+		//return compareQuantity - this.quantity;
 	}
 }

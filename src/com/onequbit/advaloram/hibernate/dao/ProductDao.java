@@ -79,7 +79,7 @@ public class ProductDao {
 	 * Get all Products
 	 * @return
 	 */
-	public static JSONObject getAllStyleCodes(){
+	public static JSONObject getStyleCodesOfActiveProducts(){
 		JSONObject resultsJson = new JSONObject();
 		JSONArray resultArray = new JSONArray();
 		Session session = null;
@@ -88,6 +88,7 @@ public class ProductDao {
 			session.beginTransaction();
 			
 			Criteria criteria = session.createCriteria(Product.class);
+			criteria.add(Restrictions.eq("status", Product.Status.ACTIVE));
 			criteria.setProjection(Projections.projectionList().add(Projections.property("id")).add(Projections.property("styleCode")));
 			List styleCodes = criteria.list();		
 

@@ -24,6 +24,7 @@ import org.hibernate.criterion.Restrictions;
 
 import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Role;
+import com.onequbit.advaloram.security.AES;
 import com.onequbit.advaloram.util.HibernateUtil;
 import com.onequbit.advaloram.util.SystemUtils;
 
@@ -109,7 +110,8 @@ public class AuthenticationEndpoint {
 			
 			Criteria criteria = session.createCriteria(AdValUser.class);
 			criteria.add(Restrictions.eq("username", username));
-			criteria.add(Restrictions.eq("password", password));
+			//criteria.add(Restrictions.eq("password", password));
+			criteria.add(Restrictions.eq("password", AES.encrypt(password, AES.KEY_ENC)));
 
 			List<AdValUser> list = criteria.list();
 			if(list.size() == 1){

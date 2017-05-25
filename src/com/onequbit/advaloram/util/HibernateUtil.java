@@ -286,7 +286,7 @@ public class HibernateUtil {
 				
 				if(field.get(entity) == null){
 					if(!entityJson.has(field.getName())){
-						entityJson.put(field.getName(), "No Data");
+						entityJson.put(field.getName(), "");
 					}
 					continue;
 				}
@@ -311,9 +311,9 @@ public class HibernateUtil {
 					continue;
 				}
 				
-				if(entity instanceof PackingList && field.getType().isAssignableFrom(SalesOrder.class)){
+				/*if(entity instanceof PackingList && field.getType().isAssignableFrom(SalesOrder.class)){
 					continue;
-				}
+				}*/
 				
 				if(field.getType().isAssignableFrom(Product.Status.class)
 					|| field.getType().isAssignableFrom(SalesOrder.Status.class)

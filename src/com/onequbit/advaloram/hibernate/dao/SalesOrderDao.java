@@ -1,5 +1,6 @@
 package com.onequbit.advaloram.hibernate.dao;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -219,6 +220,41 @@ public class SalesOrderDao {
 	 * Get all SalesOrders
 	 * @return
 	 */
+	public static List<SalesOrder> getAllSalesOrdersList(){
+
+		Session session = null;
+		List<SalesOrder> salesOrderList = new ArrayList<>();
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();		
+					
+			Criteria criteria = 
+				    session.createCriteria(SalesOrder.class)
+				           .setProjection(Projections.distinct(Projections.property("salesOrderId")));
+			
+			List<Long> salesOrdersIdList = criteria.list();
+
+			Iterator<Long> iterator = salesOrdersIdList.iterator();
+			while(iterator.hasNext()){
+				SalesOrder salesOrder = getSalesOrderLatestRevision(iterator.next());
+				salesOrderList.add(salesOrder);
+			}
+
+		} catch(Exception e){
+			e.printStackTrace();
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return salesOrderList;
+	}
+	
+	/**
+	 * Get all SalesOrders
+	 * @return
+	 */
 	public static JSONObject getOpenSalesOrdersCount(){
 		JSONObject resultsJson = new JSONObject();
 		Session session = null;
@@ -378,6 +414,11 @@ public class SalesOrderDao {
 			
 			HibernateUtil.setDataFromJson(salesOrder, salesOrderJson);			
 
+			if(!(salesOrder.vatIsApplicableOnSalesOrderDate 
+					|| salesOrder.cstIsApplicableOnSalesOrderDate
+					|| salesOrder.gstIsApplicableOnSalesOrderDate)){
+				throw new Exception("At least 1 tax should be applicable");
+			}
 			
 			JSONArray productList = salesOrderJson.getJSONArray(Tag.PRODUCT_LIST);
 			Set<SalesOrderEntry> entry = new HashSet<>();

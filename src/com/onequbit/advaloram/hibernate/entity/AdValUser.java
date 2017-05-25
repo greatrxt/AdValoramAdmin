@@ -51,11 +51,11 @@ public class AdValUser extends AbstractAdValoramEntity {
 		return username;
 	}
 	
+
 	@Column(name="password")
 	public String getPassword() {
 		return password;
 	}
-	
 	
 	@Column(name="first_name")
 	public String getFirstName() {

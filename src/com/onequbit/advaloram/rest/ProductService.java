@@ -25,8 +25,6 @@ import com.onequbit.advaloram.hibernate.dao.ProductDao;
 import com.onequbit.advaloram.hibernate.entity.Role;
 import com.onequbit.advaloram.util.SystemUtils;
 
-import main.RunIt;
-
 @Secured({Role.ADMINISTRATOR})
 @Path("/product")
 public class ProductService {
@@ -60,7 +58,7 @@ public class ProductService {
 		JSONObject result;
 		try {
 			result = new JSONObject();
-			result = ProductDao.getAllStyleCodes();
+			result = ProductDao.getStyleCodesOfActiveProducts();
 		} catch (Exception e) {
 			result = new JSONObject();
 			result.put(Application.RESULT, Application.ERROR);

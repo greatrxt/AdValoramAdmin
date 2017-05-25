@@ -5,15 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -30,20 +34,74 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.onequbit.advaloram.application.Application;
 import com.onequbit.advaloram.hibernate.dao.FileDao;
+import com.onequbit.advaloram.hibernate.dao.SalesOrderDao;
+import com.onequbit.advaloram.hibernate.entity.AdValUser;
 import com.onequbit.advaloram.hibernate.entity.Role;
+import com.onequbit.advaloram.hibernate.entity.SalesOrder;
+import com.onequbit.advaloram.util.ExcelUtil;
+import com.onequbit.advaloram.util.HibernateUtil;
+import com.onequbit.advaloram.util.SystemUtils;
 
 //@Secured({Role.ADMINISTRATOR})
-@Path("upload")	//same as UPLOAD_FOLDER_NAME
+@Path("fileService")	//same as UPLOAD_FOLDER_NAME
 public class FileService {
 
 	final static Logger logger = Logger.getLogger(FileService.class);
 	
-	public static final String UPLOAD_FOLDER_NAME = "upload";
+	public static final String UPLOAD_FOLDER_NAME = "fileService";
+	
+    private AdValUser getUser(String token)  {
+		Session session = null;
+		if(!token.trim().isEmpty()){
+			try {
+				
+				session = HibernateUtil.getSessionAnnotationFactory().openSession();
+				session.beginTransaction();
+				
+				Criteria criteria = session.createCriteria(AdValUser.class);
+				criteria.add(Restrictions.eq("token", token));
+
+				List<AdValUser> list = criteria.list();
+				if(list.size() == 1){
+					AdValUser user = list.iterator().next();
+					return user;
+				} 
+				
+			} catch(Exception e){
+				e.printStackTrace();
+			} finally {
+				if(session!=null){
+					session.close();
+				}
+			}
+		}
+		return null;
+    }
+	
+	@GET  
+    @Path("/basicSalesOrderReport/{token}")  
+    public Response getBasicReport(@Context ServletContext servletContext, @PathParam("token") String token) { 
+		AdValUser user = getUser(token);
+		if(user!=null){
+			List<SalesOrder> salesOrders = SalesOrderDao.getAllSalesOrdersList();
+			Collections.sort(salesOrders);
+			File fileToDownload = ExcelUtil.getSalesOrderReport(salesOrders);
+	        ResponseBuilder response = Response.ok((Object) fileToDownload);  
+	        response.header("Content-Disposition","attachment; filename=\"" + fileToDownload.getName() + "\"");  
+	        return response.build();  
+		} else {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+    } 
+
 	
 	@GET  
     @Path("/{entityClass}/{id}/{fileName}")  
