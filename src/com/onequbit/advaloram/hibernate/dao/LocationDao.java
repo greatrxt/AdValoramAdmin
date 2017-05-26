@@ -120,6 +120,8 @@ public class LocationDao {
 			
 			HibernateUtil.setDataFromJson(location, locationJson);
 			
+			String cityNameWithFirstCapitalLetter = location.getCityName().substring(0, 1).toUpperCase() + location.getCityName().substring(1).toLowerCase(); 
+			location.setCityName(cityNameWithFirstCapitalLetter);
 			if(getLocation(location) != null && id < 0){
 				result.put(Application.RESULT, Application.ERROR);
 				result.put(Application.ERROR_MESSAGE, "Location " + locationJson.toString() + " already exists");
