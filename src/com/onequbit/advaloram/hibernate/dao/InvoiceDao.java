@@ -210,6 +210,51 @@ public class InvoiceDao {
 	}
 
 	/**
+	 * Get all Invoices ID
+	 * @return
+	 */
+	public static JSONObject getAllInvoicesIdForCustomer(Long customerId){
+		JSONObject resultsJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
+		Session session = null;
+		try {	
+			session = HibernateUtil.getSessionAnnotationFactory().openSession();
+			session.beginTransaction();		
+			
+			
+			Criteria criteria = 
+				    session.createCriteria(Invoice.class)
+				           .setProjection(Projections.distinct(Projections.property("invoiceId")));
+			//criteria.add(Restrictions.eq("linkedPackingList.linkedCustomer", session.load(Customer.class, customerId)));
+			
+			criteria.createAlias("linkedPackingList", "packingList").add(Restrictions.eq("packingList.linkedCustomer", session.load(Customer.class, customerId)));
+			
+			List<Long> invoicesIdList = criteria.list();
+			
+			if(invoicesIdList.size() == 0){
+				//No Invoice found
+				resultsJson.put(Application.RESULT, Application.ERROR);
+				resultsJson.put(Application.ERROR_MESSAGE, "No Invoice found");
+			} else {
+				Iterator<Long> iterator = invoicesIdList.iterator();
+				while(iterator.hasNext()){
+					resultArray.put(iterator.next());
+				}
+				resultsJson.put(Application.RESULT, resultArray);
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			resultsJson = SystemUtils.generateErrorMessage(e);
+		} finally {
+			if(session!=null){
+				session.close();
+			}
+		}
+		
+		return resultsJson;
+	}
+	/**
 	 * Get all Invoices
 	 * @return
 	 */

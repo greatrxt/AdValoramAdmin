@@ -237,6 +237,26 @@ public class InvoiceService {
 	}
 	
 	@GET
+	@Path("/customer/{customerId}/idlist")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getAllInvoiceIdsForClient(@Context HttpServletRequest request, 
+			InputStream is, @Context ServletContext servletContext, @PathParam("customerId") Long customerId){
+		JSONObject result;
+		try {
+			result = new JSONObject();
+			result = InvoiceDao.getAllInvoicesIdForCustomer(customerId);
+		} catch (Exception e) {
+			result = new JSONObject();
+			result.put(Application.RESULT, Application.ERROR);
+			result.put(Application.ERROR_MESSAGE, e.getMessage());
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(result.toString()).build();
+		}
+		
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
+	@GET
 	@Path("/nextid")
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getNextInvoiceId(@Context HttpServletRequest request, 
